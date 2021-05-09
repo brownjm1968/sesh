@@ -54,24 +54,23 @@ program sesh
 
     implicit none
 !
-    COMMON AB(11), &
-           BE(11),PE(11),TEFF(11),SPIN(11),NL(10),AA(10),RC(10),GG(5,11), &
-           D(5,11),S(5,11),SI(5,11),R(5,11),EFF(5,11),J2X(4,10),J2N(4,10), &
-           SUMGJ(4,10),XN(6),E(100),SG(100),SP(100),SC(100),ST(100),G(8,4,10), &
-           GNR(8,4,10),GNRIN(8,4,10),DJL(8,4,10),SSCF,DSSCF,N,K,I,L,J,NN,NE,NI, &
-           LX,RN(6),RX(6),ZH(100),PO,PS,DPO,DPS,ZP,SGM,STM,DSGM,DSTM,TMC,DTMC, &
-           TAU,DTAU,SNC,XNSS,ITYPE,IHIST,LJX(2,8,10),LJN(2,8,10),JX2(10), &
+    COMMON AB(11),BE(11),PE(11),TEFF(11),SPIN(11),NL(10),AA(10),RC(10),GG(5,11), &
+           D(5,11),S(5,11),SI(5,11),R(5,11),EFF(5,11),J2X(4,10),J2N(4,10),       &
+           SUMGJ(4,10),XN(6),E(100),SG(100),SP(100),G(8,4,10),                   &
+           GNR(8,4,10),GNRIN(8,4,10),DJL(8,4,10),SSCF,DSSCF,N,K,I,L,J,NN,NE,NI,  &
+           LX,RN(6),RX(6),ZH(100),PO,PS,DPO,DPS,ZP,SGM,STM,DSGM,DSTM,TMC,DTMC,   &
+           TAU,DTAU,SNC,XNSS,ITYPE,IHIST,LJX(2,8,10),LJN(2,8,10),JX2(10),        &
            JN2(10),JMX(10), RB(6)
     COMMON/RANDM/ IY
     DIMENSION STI(10,100),SPI(10,100),STL(10,100,4),SPL(10,100,4)
 
-    real(4), allocatable, dimension(:) :: COMM,ZL,AP,UM,A
+    real(4), allocatable, dimension(:) :: COMM,ZL,AP,UM,A,SC,ST
     real(4), allocatable, dimension(:,:) :: SGI
     real(4), allocatable, dimension(:,:,:) :: SGL
     real(4) :: AA,AB,AI,AK,BE,CC,D,DJL,DPO,DPS,DSGM,DSSCF,DSTM, &
                DTAU,DTMC,DUMMY,E,EDD,EDGG,EFF,EJL,ETA,FJ,G,GG,GN,GNIN,GNR, &
-               GNRIN,PE,PL,PO,PS,PSI0,QI,R,RB,RC,RK,RN,RX,S,S3,SC,SG, &
-               SGM,SI,SNC,SP,SPI,SPIN,SPL,SQ,SSCF,ST,STI,STL,STM,SUM,SUMGJ, &
+               GNRIN,PE,PL,PO,PS,PSI0,QI,R,RB,RC,RK,RN,RX,S,S3,SG, &
+               SGM,SI,SNC,SP,SPI,SPIN,SPL,SQ,SSCF,STI,STL,STM,SUM,SUMGJ, &
                TAU,TEFF,TMC,U,V,VARJ2,VL,X2I,X2J,XN,XNSS,XO,XX,ZH,ZP
     integer :: I,I2,IHIST,ITYPE,ITYPO,IY,J,J2,J2MN,J2MX,J2N,J2X,JMX,JN2,JX, &
                JX2,K,KQ,KZ,L,LJN,LJX,LL,LX,M,M4,MJ,N,NE,NI,NL,NN,NQ
@@ -87,13 +86,8 @@ program sesh
     CHARACTER (LEN=100) :: cor_file_name
 
     ! --- dimension variables now -------
-    allocate(COMM(18))
-    allocate(ZL(4))
-    allocate(SGI(10,100))
-    allocate(SGL(10,100,4))
-    allocate(AP(10))
-    allocate(UM(10))
-    allocate(A(11))
+    allocate(COMM(18),ZL(4),SGI(10,100),SGL(10,100,4),AP(10),UM(10),A(11), &
+             SC(100),ST(100))
 
     ! -----------------------------------
 
