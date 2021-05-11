@@ -54,26 +54,20 @@ program sesh
 
     implicit none
 !
-    COMMON AB(11),BE(11),PE(11),TEFF(11),SPIN(11),NL(10),AA(10),RC(10),GG(5,11), &
-           D(5,11),S(5,11),SI(5,11),R(5,11),EFF(5,11),J2X(4,10),J2N(4,10),       &
-           SUMGJ(4,10),XN(6),E(100),SG(100),SP(100),G(8,4,10),                   &
-           GNR(8,4,10),GNRIN(8,4,10),DJL(8,4,10),SSCF,DSSCF,N,K,I,L,J,NN,NE,NI,  &
-           LX,RN(6),RX(6),ZH(100),PO,PS,DPO,DPS,ZP,SGM,STM,DSGM,DSTM,TMC,DTMC,   &
-           TAU,DTAU,SNC,XNSS,ITYPE,IHIST,LJX(2,8,10),LJN(2,8,10),JX2(10),        &
-           JN2(10),JMX(10), RB(6)
-    COMMON/RANDM/ IY
-    DIMENSION STI(10,100),SPI(10,100),STL(10,100,4),SPL(10,100,4)
+    real(4), allocatable, dimension(:) :: COMM,ZL,AP,UM,A,SC,ST,AB,BE,PE,TEFF, &
+                                          SPIN,AA,RC,XN,E,SG,SP,RN,RX,ZH,RB
+    integer, allocatable, dimension(:) :: JX2,JN2,JMX,NL
+    real(4), allocatable, dimension(:,:) :: SGI,GG,D,S,SI,R,EFF,SUMGJ,STI,SPI
+    integer, allocatable, dimension(:,:) :: J2X,J2N
+    real(4), allocatable, dimension(:,:,:) :: SGL,G,GNR,GNRIN,DJL,STL,SPL
+    integer, allocatable, dimension(:,:,:) :: LJX,LJN
 
-    real(4), allocatable, dimension(:) :: COMM,ZL,AP,UM,A,SC,ST
-    real(4), allocatable, dimension(:,:) :: SGI
-    real(4), allocatable, dimension(:,:,:) :: SGL
-    real(4) :: AA,AB,AI,AK,BE,CC,D,DJL,DPO,DPS,DSGM,DSSCF,DSTM, &
-               DTAU,DTMC,DUMMY,E,EDD,EDGG,EFF,EJL,ETA,FJ,G,GG,GN,GNIN,GNR, &
-               GNRIN,PE,PL,PO,PS,PSI0,QI,R,RB,RC,RK,RN,RX,S,S3,SG, &
-               SGM,SI,SNC,SP,SPI,SPIN,SPL,SQ,SSCF,STI,STL,STM,SUM,SUMGJ, &
-               TAU,TEFF,TMC,U,V,VARJ2,VL,X2I,X2J,XN,XNSS,XO,XX,ZH,ZP
-    integer :: I,I2,IHIST,ITYPE,ITYPO,IY,J,J2,J2MN,J2MX,J2N,J2X,JMX,JN2,JX, &
-               JX2,K,KQ,KZ,L,LJN,LJX,LL,LX,M,M4,MJ,N,NE,NI,NL,NN,NQ
+    real(4) :: AI,AK,CC,DPO,DPS,DSGM,DSSCF,DSTM,DTAU,DTMC,DUMMY,EDD,EDGG,EJL, &
+               ETA,FJ,GN,GNIN,PL,PO,PS,PSI0,QI,RK,S3,SGM,SNC,SQ,SSCF,STM,SUM, &
+               TAU,TMC,U,V,VARJ2,VL,X2I,X2J,XNSS,XO,XX,ZP
+
+    integer :: I,I2,IHIST,ITYPE,ITYPO,IY,J,J2,J2MN,J2MX,JX,K,KQ,KZ,L,LL,LX,M, &
+               M4,MJ,N,NE,NI,NN,NQ
 
 !    CHARACTER*26 CDATE
 ! FG051198
@@ -86,8 +80,13 @@ program sesh
     CHARACTER (LEN=100) :: cor_file_name
 
     ! --- dimension variables now -------
-    allocate(COMM(18),ZL(4),SGI(10,100),SGL(10,100,4),AP(10),UM(10),A(11), &
-             SC(100),ST(100))
+    allocate(COMM(18),ZL(4),SGI(10,100),SGL(10,100,4),AP(10),UM(10),A(11),      &
+             SC(100),ST(100),AB(11),BE(11),PE(11),TEFF(11),SPIN(11),NL(10),     &
+             AA(10),RC(10),GG(5,11),D(5,11),S(5,11),SI(5,11),R(5,11),EFF(5,11), &
+             J2X(4,10),J2N(4,10),SUMGJ(4,10),XN(6),E(100),SG(100),SP(100),      &
+             G(8,4,10),GNR(8,4,10),GNRIN(8,4,10),DJL(8,4,10),RN(6),RX(6),       &
+             ZH(100),LJX(2,8,10),LJN(2,8,10),JX2(10),JN2(10),JMX(10),RB(6),     &
+             STI(10,100),SPI(10,100),STL(10,100,4),SPL(10,100,4))
 
     ! -----------------------------------
 
@@ -647,12 +646,18 @@ program sesh
             GO TO (39,40,42,43),ITYPE
 !           39 xx and 43 off to shut off multiple scattering (39, 40, 42, 43)
 !           CYLINDRICAL SAMPLE CAPTURE
-39          CALL MUSC(COMM,ZL,SGI,SGL,AP,UM,A)
+39          CALL MUSC(COMM,ZL,SGI,SGL,AP,UM,A,AB,BE,PE,TEFF,SPIN,NL,AA,RC,GG, &
+                D,S,SI,R,EFF,J2X,J2N,SUMGJ,XN,E,SG,SP,G,GNR,GNRIN,DJL,SSCF,DSSCF, &
+                N,K,I,L,J,NN,NE,NI,LX,RN,RX,ZH,PO,PS,DPO,DPS,ZP,SGM,STM,DSGM,DSTM, &
+                TMC,DTMC,TAU,DTAU,SNC,XNSS,ITYPE,IHIST,LJX,LJN,JX2,JN2,JMX, RB)
 !
             GO TO 41
 !
 !           SPHERICAL SHELL CAPTURE
-40          CALL MUSS(COMM,ZL,SGI,SGL,AP,UM,A)
+40          CALL MUSS(COMM,ZL,SGI,SGL,AP,UM,A,AB,BE,PE,TEFF,SPIN,NL,AA,RC,GG, &
+                D,S,SI,R,EFF,J2X,J2N,SUMGJ,XN,E,SG,SP,G,GNR,GNRIN,DJL,SSCF,DSSCF, &
+                N,K,I,L,J,NN,NE,NI,LX,RN,RX,ZH,PO,PS,DPO,DPS,ZP,SGM,STM,DSGM,DSTM, &
+                TMC,DTMC,TAU,DTAU,SNC,XNSS,ITYPE,IHIST,LJX,LJN,JX2,JN2,JMX, RB)
 !
             XN(N)=RX(N)-RN(N)
 41          IF(K.EQ.1) &
@@ -665,7 +670,10 @@ program sesh
             GO TO 44
 !
 !           TRANSMISSION
-42          CALL MOCT(COMM,ZL,SGI,SGL,AP,UM,A)
+42          CALL MOCT(COMM,ZL,SGI,SGL,AP,UM,A,AB,BE,PE,TEFF,SPIN,NL,AA,RC,GG, &
+                D,S,SI,R,EFF,J2X,J2N,SUMGJ,XN,E,SG,SP,G,GNR,GNRIN,DJL,SSCF,DSSCF, &
+                N,K,I,L,J,NN,NE,NI,LX,RN,RX,ZH,PO,PS,DPO,DPS,ZP,SGM,STM,DSGM,DSTM, &
+                TMC,DTMC,TAU,DTAU,SNC,XNSS,ITYPE,IHIST,LJX,LJN,JX2,JN2,JMX, RB)
 !
             IF(K.EQ.1) &
                 WRITE(8,119)XN(N),E(K),SGM,STM,TMC,TAU,ZH(K),ZP,DSGM,DSTM,DTMC,DTAU
@@ -674,7 +682,10 @@ program sesh
             GO TO 44
 !
 !           SELF-INDICATION
-43          CALL MUSC(COMM,ZL,SGI,SGL,AP,UM,A)
+43          CALL MUSC(COMM,ZL,SGI,SGL,AP,UM,A,AB,BE,PE,TEFF,SPIN,NL,AA,RC,GG, &
+                D,S,SI,R,EFF,J2X,J2N,SUMGJ,XN,E,SG,SP,G,GNR,GNRIN,DJL,SSCF,DSSCF, &
+                N,K,I,L,J,NN,NE,NI,LX,RN,RX,ZH,PO,PS,DPO,DPS,ZP,SGM,STM,DSGM,DSTM, &
+                TMC,DTMC,TAU,DTAU,SNC,XNSS,ITYPE,IHIST,LJX,LJN,JX2,JN2,JMX, RB)
 !
             IF(K.EQ.1) &
                 WRITE(8,121)XN(N),E(K),SGM,STM,PO,PS,SSCF,SNC, ZH(K),ZP,RX(N), &

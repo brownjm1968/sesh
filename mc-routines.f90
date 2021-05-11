@@ -1,7 +1,10 @@
 module mc_routines
     contains
 
-subroutine musc(COMM,ZL,SGI,SGL,AP,UM,A)
+subroutine musc(COMM,ZL,SGI,SGL,AP,UM,A,AB,BE,PE,TEFF,SPIN,NL,AA,RC,GG,D,S,SI, &
+                R,EFF,J2X,J2N,SUMGJ,XN,E,SG,SP,G,GNR,GNRIN,DJL,SSCF,DSSCF,N,K, &
+                I,L,J,NN,NE,NI,LX,RN,RX,ZH,PO,PS,DPO,DPS,ZP,SGM,STM,DSGM,DSTM, &
+                TMC,DTMC,TAU,DTAU,SNC,XNSS,ITYPE,IHIST,LJX,LJN,JX2,JN2,JMX, RB)
 
     implicit none
 !             MUSC  YIELDS THE MULTIPLE SCATTERING CORRECTION FOR A
@@ -10,35 +13,30 @@ subroutine musc(COMM,ZL,SGI,SGL,AP,UM,A)
 !                RX(N)      CAPTURE SAMPLE RADIUS
 !                RB(N)      NEUTRON BEAM RADIUS
 !                RN(N)      FILTER  SAMPLE THICKNESS
-    COMMON AB(11),BE(11),PE(11),TEFF(11),SPIN(11),NL(10),AA(10),RC(10),GG(5,11), &
-           D(5,11),S(5,11),SI(5,11),R(5,11),EFF(5,11),J2X(4,10),J2N(4,10),       &
-           SUMGJ(4,10),XN(6),E(100),SG(100),SP(100),G(8,4,10),                   &
-           GNR(8,4,10),GNRIN(8,4,10),DJL(8,4,10),SSCF,DSSCF,N,K,I,L,J,NN,NE,NI,  &
-           LX,RN(6),RX(6),ZH(100),PO,PS,DPO,DPS,ZP,SGM,STM,DSGM,DSTM,TMC,DTMC,   &
-           TAU,DTAU,SNC,XNSS,ITYPE,IHIST,LJX(2,8,10),LJN(2,8,10),JX2(10),        &
-           JN2(10),JMX(10), RB(6)
-
-    COMMON/A/ PSM(1000),POM(1000),DOP(10,10),PLE(10,4,10),GGE(10,4,10),         &
-    DE(10,8,4,10),GNE(10,8,4,10),GNINE(10,8,4,10),EE(10),STMC(1000),SGMC(1000), &
-    TM(1000)
-    DIMENSION ZST(101),ZSG(101),ZT(101),ZF0(101),GNL(8),COSE(10,4,10),SINE(10,4,10)
     
-    real(4), allocatable, dimension(:) :: COMM,ZL,AP,UM,A,SS,STT
-    real(4), allocatable, dimension(:,:) :: SGI
-    real(4), allocatable, dimension(:,:,:) :: SGL
-    real(4) :: arbitrary,AA,AB,AK,B1,B11,B12,B2,B23,B3,BBOTH,BE,C0,CG,    &
-               COSE,CT,CTH,CTHC,D,DD,DE, DEN,DJL,DOP,DPO,DPS,DSGM,DSSCF,  &
-               DSTM,DTAU,DTMC,DUMMY,DYN,E,EDD,EDGG,EE,EFF,ETA,EXN1,FE,FP,G,GG, &
-               GGE,GNE,GNINE,GNINS,GNL,GNR,GNRIN,GNS,GT,H,HNEG,HPOS,O,PE,PHI,  &
-               PLE,PO,POM,POMG,PS,PSM,PSMG,R,RB,RC,RHO,RK,RN,RX,S,SAM,SC,SCC,  &
-               SEM,SG,SGM,SGMC,SI,SIM,SINE,SN,SNC,SOM,SP,SPIN,SQ,   &
-               SSCF,ST,STH,STM,STMC,SUM,SUMF0,SUMGJ,SUMSG,SUMST,SUMT,SYM,  &
-               T,TAU,TEFF,TF,TM,TMC,TP,TX,U,UU,V,VL,VV,W,WG,WI,WN,X,XI,XN,  &
-               XNSS,Y,Z,ZF0,ZH,ZP,ZSG,ZSIR,ZST,ZT
-    integer :: I,IHIST,ITYPE,IZ,J,J2N,J2X,JL,JMX,JN2,JX,JX2,K,KZ,L,L1,L2,LJN,  &
-               LJX,LP,LX,M,MCHD,MDIV,MM,MP,N,NC,NE,NH,NI,NL,NN,NP,NS
+    real(4), allocatable, dimension(:) :: COMM,ZL,AP,UM,A,SS,STT,AB,BE,PE,TEFF, &
+                              SPIN,AA,RC,XN,E,SG,SP,RN,RX,ZH,RB,ZST,ZSG,ZT,ZF0, &
+                              GNL,PSM,POM,EE,STMC,SGMC,TM
+    integer, allocatable, dimension(:) :: NL,JX2,JN2,JMX
+    real(4), allocatable, dimension(:,:) :: SGI,GG,D,S,SI,R,EFF,SUMGJ,DOP
+    integer, allocatable, dimension(:,:) :: J2X,J2N
+    real(4), allocatable, dimension(:,:,:) :: SGL,G,GNR,GNRIN,DJL,SINE,COSE,PLE,GGE
+    integer, allocatable, dimension(:,:,:) :: LJX,LJN
+    real(4), allocatable, dimension(:,:,:,:) :: DE,GNE,GNINE
 
-    allocate(SS(100),STT(100))
+    real(4) :: arbitrary,AK,B1,B11,B12,B2,B23,B3,BBOTH,C0,CG,CT,CTH,CTHC,DD,  &
+               DEN,DPO,DPS,DSGM,DSSCF,DSTM,DTAU,DTMC,DUMMY,DYN,EDD,EDGG,ETA,  &
+               EXN1,FE,FP,GNINS,GNS,GT,H,HNEG,HPOS,O,PHI,PO,POMG,PS,PSMG,RHO, &
+               RK,SAM,SC,SCC,SEM,SGM,SIM,SN,SNC,SOM,SQ,SSCF,ST,STH,STM,SUM,   &
+               SUMF0,SUMSG,SUMST,SUMT,SYM,T,TAU,TF,TMC,TP,TX,U,UU,V,VL,VV,W,  &
+               WG,WI,WN,X,XI,XNSS,Y,Z,ZP,ZSIR
+    integer :: I,IHIST,ITYPE,IZ,J,JL,JX,K,KZ,L,L1,L2,LP,LX,M,MCHD,MDIV,MM,MP,N, &
+               NC,NE,NH,NI,NN,NP,NS
+
+    allocate(SS(100),STT(100),ZST(101),ZSG(101),ZT(101),ZF0(101),GNL(8),      &
+             COSE(10,4,10),SINE(10,4,10),DE(10,8,4,10),GNE(10,8,4,10),        &
+             GNINE(10,8,4,10),PLE(10,4,10),GGE(10,4,10),DOP(10,10),PSM(1000), &
+             POM(1000),EE(10),STMC(1000),SGMC(1000),TM(1000))
 
     
     IF(IHIST.NE.1)GO TO 51
@@ -370,39 +368,38 @@ subroutine musc(COMM,ZL,SGI,SGL,AP,UM,A)
     RETURN
 end subroutine musc
 !
-subroutine muss(COMM,ZL,SGI,SGL,AP,UM,A)
+subroutine muss(COMM,ZL,SGI,SGL,AP,UM,A,AB,BE,PE,TEFF,SPIN,NL,AA,RC,GG,D,S,SI, &
+                R,EFF,J2X,J2N,SUMGJ,XN,E,SG,SP,G,GNR,GNRIN,DJL,SSCF,DSSCF,N,K, &
+                I,L,J,NN,NE,NI,LX,RN,RX,ZH,PO,PS,DPO,DPS,ZP,SGM,STM,DSGM,DSTM, &
+                TMC,DTMC,TAU,DTAU,SNC,XNSS,ITYPE,IHIST,LJX,LJN,JX2,JN2,JMX, RB)
 
     implicit none
 !             MUSS YIELDS THE MULTIPLE SCATTERING CORRECTION FOR A
 !             SPHERICAL SHELL (MONTE CARLO)
-    COMMON AB(11),BE(11),PE(11),TEFF(11),SPIN(11),NL(10),AA(10),RC(10),GG(5,11), &
-           D(5,11),S(5,11),SI(5,11),R(5,11),EFF(5,11),J2X(4,10),J2N(4,10),       &
-           SUMGJ(4,10),XN(6),E(100),SG(100),SP(100),G(8,4,10),                   &
-           GNR(8,4,10),GNRIN(8,4,10),DJL(8,4,10),SSCF,DSSCF,N,K,I,L,J,NN,NE,NI,  &
-           LX,RN(6),RX(6),ZH(100),PO,PS,DPO,DPS,ZP,SGM,STM,DSGM,DSTM,TMC,DTMC,   &
-           TAU,DTAU,SNC,XNSS,ITYPE,IHIST,LJX(2,8,10),LJN(2,8,10),JX2(10),        &
-           JN2(10),JMX(10), RB(6)
 
-    COMMON/A/ PSM(1000),POM(1000),DOP(10,10),PLE(10,4,10),GGE(10,4,10), &
-              DE(10,8,4,10),GNE(10,8,4,10),GNINE(10,8,4,10),EE(10),STMC(1000), &
-              SGMC(1000),TM(1000)
-    DIMENSION ZST(101),ZSG(101),ZT(101),ZF0(101),GNL(8),COSE(10,4,10),SINE(10,4,10)
-    
-    real(4), allocatable, dimension(:) :: COMM,ZL,AP,UM,A,SS,STT
-    real(4), allocatable, dimension(:,:) :: SGI
-    real(4), allocatable, dimension(:,:,:) :: SGL
-    real(4) :: arbitrary,A1,A2,AA,AB,B11,B12,B23,BBOTH,BE,C0,CG,COSE, &
-               CT,CTH,D,DD,DE,DEN,DJL,DOP,DPO,DPS,DSGM,DSSCF,DSTM,DTAU,DTMC,    &
-               DYN,E,EDD,EDGG,EE,EFF,ETA,FE,G,GG,GGE,GNE,GNINE,GNINS,GNL,GNR,   &
-               GNRIN,GNS,GT,H,HNEG,HPOS,PE,PLE,PO, POM,POMG,PS,PSM,PSMG,Q,R,RB, &
-               RC,RK,RN,RX,S,SAM,SC,SCC,SEM,SG,SGM,SGMC,SI,SIM,SINE,SN, &
-               SNC,SOM,SP,SPIN,SQ,SSCF,ST,STH,STM,STMC,SUM,SUMF0,SUMGJ,  &
-               SUMSG,SUMST,SUMT,SYM,T,TAU,TEFF,TM,TMC,TX,UU,VL,VV,W,WG,WI,   &
-               WN,XI,XN,XNSS,Z,ZF0,ZH,ZP,ZSG,ZST,ZT
-    integer :: I,IHIST,ITYPE,IZ,J,J2N,J2X,JL,JMX,JN2,JX,JX2,K,KZ,L,L1,L2,LJN,   &
-               LJX,LP,LX,M,MCHD,MDIV,MM,MP,N,NN,NC,NE,NH,NI,NL,NP,NS
+    real(4), allocatable, dimension(:) :: COMM,ZL,AP,UM,A,SS,STT,AB,BE,PE,TEFF, &
+                              SPIN,AA,RC,XN,E,SG,SP,RN,RX,ZH,RB,ZST,ZSG,ZT,ZF0, &
+                              GNL,EE,STMC,SGMC,TM,PSM,POM
+    integer, allocatable, dimension(:) :: NL,JX2,JN2,JMX
+    real(4), allocatable, dimension(:,:) :: SGI,GG,D,S,SI,R,EFF,SUMGJ,DOP
+    integer, allocatable, dimension(:,:) :: J2X,J2N
+    real(4), allocatable, dimension(:,:,:) :: SGL,G,GNR,GNRIN,DJL,SINE,COSE,PLE,GGE
+    integer, allocatable, dimension(:,:,:) :: LJX,LJN
+    real(4), allocatable, dimension(:,:,:,:) :: DE,GNE,GNINE
 
-    allocate(SS(100),STT(100))
+    real(4) :: arbitrary,A1,A2,AK,B1,B11,B12,B2,B23,B3,BBOTH,C0,CG,CT,CTH,CTHC, &
+               DD,DEN,DPO,DPS,DSGM,DSSCF,DSTM,DTAU,DTMC,DUMMY,DYN,EDD,EDGG,ETA, &
+               EXN1,FE,FP,GNINS,GNS,GT,H,HNEG,HPOS,O,PHI,PO,POMG,PS,PSMG,RHO,   &
+               RK,SAM,SC,SCC,SEM,SGM,SIM,SN,SNC,SOM,SQ,SSCF,ST,STH,STM,SUM,     &
+               SUMF0,SUMSG,SUMST,SUMT,SYM,T,TAU,TF,TMC,TP,TX,U,UU,V,VL,VV,W,WG, &
+               WI,WN,X,XI,XNSS,Y,Z,ZP,ZSIR,Q
+    integer :: I,IHIST,ITYPE,IZ,J,JL,JX,K,KZ,L,L1,L2,LP,LX,M,MCHD,MDIV,MM,MP,N, &
+               NC,NE,NH,NI,NN,NP,NS
+
+    allocate(SS(100),STT(100),ZST(101),ZSG(101),ZT(101),ZF0(101),GNL(8),        &
+             COSE(10,4,10),SINE(10,4,10),EE(10),STMC(1000),SGMC(1000),TM(1000), &
+             PSM(1000),POM(1000),PLE(10,4,10),GGE(10,4,10),DOP(10,10),          &
+             DE(10,8,4,10),GNE(10,8,4,10),GNINE(10,8,4,10))
     
     IF(IHIST.NE.1)GO TO 51
     DO 50 IZ=1,101
@@ -674,38 +671,39 @@ subroutine muss(COMM,ZL,SGI,SGL,AP,UM,A)
     RETURN
 end subroutine muss
 !
-subroutine moct(COMM,ZL,SGI,SGL,AP,UM,A)
+subroutine moct(COMM,ZL,SGI,SGL,AP,UM,A,AB,BE,PE,TEFF,SPIN,NL,AA,RC,GG,D,S,SI, &
+                R,EFF,J2X,J2N,SUMGJ,XN,E,SG,SP,G,GNR,GNRIN,DJL,SSCF,DSSCF,N,K, &
+                I,L,J,NN,NE,NI,LX,RN,RX,ZH,PO,PS,DPO,DPS,ZP,SGM,STM,DSGM,DSTM, &
+                TMC,DTMC,TAU,DTAU,SNC,XNSS,ITYPE,IHIST,LJX,LJN,JX2,JN2,JMX, RB)
 
     implicit none
 !             MOCT  YIELDS THE SELF-SHIELDING CORRECTION FACTOR AND
 !             TRANSMISSION FOR A CYLINDRICAL SAMPLE
-    COMMON AB(11),BE(11),PE(11),TEFF(11),SPIN(11),NL(10),AA(10),RC(10),GG(5,11), &
-           D(5,11),S(5,11),SI(5,11),R(5,11),EFF(5,11),J2X(4,10),J2N(4,10),       &
-           SUMGJ(4,10),XN(6),E(100),SG(100),SP(100),G(8,4,10),                   &
-           GNR(8,4,10),GNRIN(8,4,10),DJL(8,4,10),SSCF,DSSCF,N,K,I,L,J,NN,NE,NI,  &
-           LX,RN(6),RX(6),ZH(100),PO,PS,DPO,DPS,ZP,SGM,STM,DSGM,DSTM,TMC,DTMC,   &
-           TAU,DTAU,SNC,XNSS,ITYPE,IHIST,LJX(2,8,10),LJN(2,8,10),JX2(10),        &
-           JN2(10),JMX(10), RB(6)
 
-    COMMON /B/ TMCG(1000),SGMC(1000),STMC(1000),DOP(10),GGE(4,10),DE(8,4,10), &
-               VL(4,10),PL(4,10),EDGG(10,100),EDD(10,100),GN(8,4,10),GNIN(8,4,10)
-    DIMENSION TN(101),ZT(101),GNL(8),SINE(4,10),COSE(4,10)
-    DIMENSION ZST(101), ZSG(101)
+    real(4), allocatable, dimension(:) :: COMM,ZL,AP,UM,A,SS,STT,AB,BE,PE,TEFF, &
+                              SPIN,AA,RC,XN,E,SG,SP,RN,RX,ZH,RB,ZST,ZSG,ZT,ZF0, &
+                              GNL,TMCG,TN,SGMC,STMC,DOP
+    integer, allocatable, dimension(:) :: NL,JX2,JN2,JMX
+    real(4), allocatable, dimension(:,:) :: SGI,GG,D,S,SI,R,EFF,SUMGJ,PL,SINE,  &
+                                            COSE,GGE,VL,EDGG,EDD
+    integer, allocatable, dimension(:,:) :: J2X,J2N
+    real(4), allocatable, dimension(:,:,:) :: SGL,G,GNR,GNRIN,DJL,GN,GNIN,DE
+    integer, allocatable, dimension(:,:,:) :: LJX,LJN
 
-    real(4), allocatable, dimension(:) :: COMM,ZL,AP,UM,A,SS,STT
-    real(4), allocatable, dimension(:,:) :: SGI
-    real(4), allocatable, dimension(:,:,:) :: SGL
-    real(4) :: arbitrary, aa,ab,ak,AVT,AVTS,BE,C0,CG,COSE,CT,D,DD,DE, &
-               DEN,DJL,DOP,DPO,DPS,DSGM,DSSCF,DSTM,DT,DTAU,DTMC,DTS,DTS2,DUMMY, &
-               E,EDD,EDGG,EFF,ETA,G,GG,GGE,Gn,GNIN,GNINS,GNL,GNR,GNRIN,GNS,GT, &
-               H,HNEG,HPOS,  PE,PL,PO,PS,R,RB,RC,RK,RN,RX,S,SC,SCC,SG, &
-               SGM,SGMC,SI,SIM,SINE,SN,SNC,SP,SPIN,SSCF,ST,STM,STMC, &
-               SUMGJ,SUMSG,SUMST,SUMT,SYM,T,TAU,TEFF,TMC,TMCG,TN,TNUM,TS,TSSM, &
-               TSUM,UU,VL,VV,XI,XN,XNSS,ZH,ZP,ZSG,ZST,ZT
-    integer :: I,IHIST,IT,ITYPE,IZ,J,J2N,J2X,JL,JMX,JN2,JX,JX2,K,KZ,L,L1,L2, &
-               LJN,LJX,LP,LX,M,MCHD,MDIV,MM,MP,N,NE,NH,NHIST,NI,NL,NN,NP
+    real(4) :: arbitrary,AK,AVT,AVTS,B1,B11,B12,B2,B23,B3,BBOTH,C0,CG,CT,CTH, &
+               CTHC,DD, DEN,DPO,DPS,DSGM,DSSCF,DSTM,DT,DTS,DTS2,DTAU,DTMC,    &
+               DUMMY,DYN,EE,ETA,EXN1,FE,FP,GNE,GNINE,GNINS,GNS,GT,H,HNEG,     &
+               HPOS,O,PHI,PLE,PO,POM,POMG,PS,PSM,PSMG,RHO,RK,SAM,SC,SCC,SEM,  &
+               SGM,SIM,SN,SNC,SOM,SQ,SSCF,ST,STH,STM,SUM,SUMF0,SUMSG,SUMST,   &
+               SUMT,SYM,T,TAU,TF,TM,TMC,TP,TX,U,UU,V,VV,W,WG,WI,WN,X,XI,XNSS, &
+               Y,Z,ZP,ZSIR,TNUM,TS,TSSM,TSUM,A1,A2,Q
+    integer :: I,IHIST,IT,ITYPE,IZ,J,JL,JX,K,KZ,L,L1,L2,LP,LX,M,MCHD,MDIV,MM, &
+               MP,N,NC,NE,NH,NHIST,NI,NN,NP,NS
 
-    allocate(SS(100),STT(100))
+    allocate(ZST(101),ZSG(101),ZT(101),TN(101),GNL(8),COSE(4,10),SINE(4,10), &
+             GN(8,4,10),GNIN(8,4,10),PL(4,10),TMCG(1000),SGMC(1000),         &
+             STMC(1000),DOP(10),GGE(4,10),VL(4,10),EDGG(10,100),EDD(10,100), &
+             DE(8,4,10))
 
     MM=1
     SIM=0.
@@ -926,7 +924,8 @@ subroutine peps(RK,L,PL,VL)
 
     real(4), intent(in) :: RK
     integer, intent(in) :: L
-    real(4), intent(out) :: PL,VL
+    real(4), intent(out) :: PL
+    real(4) :: VL
 
     GO TO (1,2,3,4),L
 1   PL=RK
@@ -951,9 +950,8 @@ subroutine endep(E,A,B,P,AP,UM,EDGG,EDD)
 
     real(4), intent(in) :: A,B,P,AP,UM
     real(4), intent(inout) :: E
-    real(4), intent(out) :: EDD,EDGG
 
-    real(4) :: Y1,Y2,A1,E1,E2,ER,F1,F2,GR,SUM1,SUM2,U,U1X,U2X,UB,U1,U2
+    real(4) :: Y1,Y2,A1,E1,E2,ER,F1,F2,GR,SUM1,SUM2,U,U1X,U2X,UB,U1,U2,EDGG,EDD
     integer :: N
 
     DIMENSION Y1(21),Y2(21)
@@ -1007,7 +1005,6 @@ function rho(U,A,PE,AP,UM)
     real(4) :: rho,VARJ2
     real(4) :: AI,AU4,T,UEFF
 
-
     AI=FLOAT(INT(A+1.5))
     IF(U.GT.UM)GO TO 1
 !   LOW ENERGIES: CONSTANT-TEMPERATURE FORMULA
@@ -1037,8 +1034,7 @@ subroutine aver(SGMC,SC,STMC,ST,NS,I)
 
     real(4) :: corr,W
     integer :: N,J
-      
-
+    
     DATA N,J/100,0/
 !        N   GROUP SIZE
 !        I=1 SUPPLY DATA TO BE GROUPED
@@ -1115,10 +1111,10 @@ subroutine avert(TM,T,SGM,SC,STM,ST,MM,I)
 
     real(4), intent(in) :: T,SC,ST
     integer, intent(in) :: I
-    real(4), intent(inout) :: TM,SGM,STM
+    real(4), intent(inout) :: TM
     integer, intent(inout) :: MM
 
-    real(4) :: corr,W
+    real(4) :: corr,W,SGM,STM
     integer :: N,J
 
     DATA N,J/100,0/
@@ -1167,7 +1163,6 @@ subroutine pfcn(X,Y,U,V,K)
     real(4) :: AM,CXP2,CXY2,D,DM,DP,EMN,EYP2,EYX,F,P,PI,PI2,SU,SV,SXP2,SXY2, &
                XNM,XNP,XP2,XY,XY2,Y2
     integer :: I,IS,N
-
 
     DATA PI,PI2,N,IS/3.14159 ,6.28318 ,5,0/
     DIMENSION EMN(10)
@@ -1411,7 +1406,6 @@ subroutine space(DAV,D)
     D=1.12837  *DAV*X
     RETURN
 end subroutine space
-
 
 function random(arbitrary)
     implicit none
