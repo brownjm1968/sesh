@@ -40,11 +40,12 @@ subroutine musc(COMM,ZL,SGI,SGL,AP,UM,A,AB,BE,PE,TEFF,SPIN,NL,AA,RC,GG,D,S,SI, &
 
     
     IF(IHIST.NE.1)GO TO 51
-    DO 50 IZ=1,101
-    ZST(IZ)=0.
-    ZSG(IZ)=0.
-    ZT (IZ)=0.
-50  ZF0(IZ)=0.
+    do IZ=1,101
+        ZST(IZ)=0.
+        ZSG(IZ)=0.
+        ZT (IZ)=0.
+        ZF0(IZ)=0.
+    end do  
 51  CONTINUE
     NS=1
     MM=1
@@ -61,42 +62,45 @@ subroutine musc(COMM,ZL,SGI,SGL,AP,UM,A,AB,BE,PE,TEFF,SPIN,NL,AA,RC,GG,D,S,SI, &
 !   A2=A1*SG(K)
 !   IF(ITYPE.EQ.4)A1=A1*EXP(-STT(K)*RN(N))
     FE=1.-2./(A(1)*AA(1))
-    DO 20 NC=1,10
-    IF(NC.EQ.1)EE(NC)=E(K)
-    IF(NC.GT.1)EE(NC)=EE(NC-1)*FE
-    DO 20 I=1,NI
-! ---- Doppler? -------------------------------------------------------
-        DOP(NC,I)=SQRT(0.72531*A(I)/TEFF(I)/EE(NC))
-!
-         CALL ENDEP(EE(NC),A(I),BE(I),PE(I),AP(I),UM(I),EDGG,EDD)
-        
-        LX=NL(I)
-        DO 20 L=1,LX
-        GGE(NC,L,I)=GG(L,I)*EDGG
-        AK=RC(I)*SQRT(EE(NC)/AA(I))/143.92
-!
-! ---- penetrabilities, etc..... --------------------------------------
-         CALL PEPS(AK,L,DUMMY,VL)
-!
-        RK=AK*R(L,I)/RC(I)
-!
-         CALL PEPS(RK,L,PLE(NC,L,I),DUMMY)
-!
-        SINE(NC,L,I)=SIN(2.*PLE(NC,L,I))
-        COSE(NC,L,I)=COS(2.*PLE(NC,L,I))
-        JX=(J2X(L,I)-J2N(L,I))/2+1
-        DO 20 JL=1,JX
-        J=(J2N(L,I)-JN2(I))/2+JL
-        DE(NC,J,L,I)=DJL(JL,L,I)*EDD 
-        SQ=SQRT(EE(NC)*1000.)*VL*EDD
-        GNE  (NC,J,L,I)=GNR  (JL,L,I)*SQ
-        GNINE(NC,J,L,I)=GNRIN(JL,L,I)*SQ
-20  CONTINUE
+    do NC=1,10
+        IF(NC.EQ.1)EE(NC)=E(K)
+        IF(NC.GT.1)EE(NC)=EE(NC-1)*FE
+        do I=1,NI
+    ! ---- Doppler? -------------------------------------------------------
+            DOP(NC,I)=SQRT(0.72531*A(I)/TEFF(I)/EE(NC))
+    !
+             CALL ENDEP(EE(NC),A(I),BE(I),PE(I),AP(I),UM(I),EDGG,EDD)
+            
+            LX=NL(I)
+            do L=1,LX
+                GGE(NC,L,I)=GG(L,I)*EDGG
+                AK=RC(I)*SQRT(EE(NC)/AA(I))/143.92
+        !
+        ! ---- penetrabilities, etc..... --------------------------------------
+                 CALL PEPS(AK,L,DUMMY,VL)
+        !
+                RK=AK*R(L,I)/RC(I)
+        !
+                 CALL PEPS(RK,L,PLE(NC,L,I),DUMMY)
+        !
+                SINE(NC,L,I)=SIN(2.*PLE(NC,L,I))
+                COSE(NC,L,I)=COS(2.*PLE(NC,L,I))
+                JX=(J2X(L,I)-J2N(L,I))/2+1
+                do JL=1,JX
+                    J=(J2N(L,I)-JN2(I))/2+JL
+                    DE(NC,J,L,I)=DJL(JL,L,I)*EDD 
+                    SQ=SQRT(EE(NC)*1000.)*VL*EDD
+                    GNE  (NC,J,L,I)=GNR  (JL,L,I)*SQ
+                    GNINE(NC,J,L,I)=GNRIN(JL,L,I)*SQ
+                end do
+            end do
+        end do
+    end do
       
 !             BEGIN LOOP OF NEUTRON HISTORIES
     NH=ZH(K)
     NP=ZP
-    DO 1 M=1,NH
+    do M=1,NH
 !       PRINT HISTORY COUNTER
         IF(NH.LE.100)MDIV=10
         IF(NH.GT.100 .AND. NH.LE.1000)MDIV=100
@@ -151,12 +155,13 @@ subroutine musc(COMM,ZL,SGI,SGL,AP,UM,A,AB,BE,PE,TEFF,SPIN,NL,AA,RC,GG,D,S,SI, &
 !                     FIND REDUCED NEUTRON WIDTH
 17                  GNS=0.
                     GNINS=0.
-                    DO 40 L=L1,L2,2
+                    DO L = L1,L2,2
 !
-                    CALL PORTER(GNE(NC,J,L,I),GNL(L))
-!
-                    GNS=GNS+GNL(L)
-40                  GNINS=GNINS+GNINE(NC,J,L,I)
+                        CALL PORTER(GNE(NC,J,L,I),GNL(L))
+                        
+                        GNS=GNS+GNL(L)
+                        GNINS=GNINS+GNINE(NC,J,L,I)
+                    end do
                     GT=GNS+GNINS+GGE(NC,L1,I)
                     ETA=GT*DOP(NC,I)
                     XI=2.*ETA*H/GT
@@ -170,8 +175,9 @@ subroutine musc(COMM,ZL,SGI,SGL,AP,UM,A,AB,BE,PE,TEFF,SPIN,NL,AA,RC,GG,D,S,SI, &
 !                     EFFECTIVE CAPTURE CROSS SECTION
                     SC=SC+SCC*EFF(L1,I)
 !                     TOTAL CROSS SECTION
-                    DO 41 L=L1,L2,2
-41                  ST=ST+CT*GNL(L)*(UU*COSE(NC,L,I)+VV*SINE(NC,L,I))
+                    do L=L1,L2,2
+                        ST=ST+CT*GNL(L)*(UU*COSE(NC,L,I)+VV*SINE(NC,L,I))
+                    end do
                     IF(MP.EQ.1)GO TO 18
 !                         CHECK IF SECOND MEMBER OF PAIR IS ALREADY INCLUDED
                     IF(H.LT.0.)GO TO 16
@@ -282,7 +288,8 @@ subroutine musc(COMM,ZL,SGI,SGL,AP,UM,A,AB,BE,PE,TEFF,SPIN,NL,AA,RC,GG,D,S,SI, &
         GO TO 2
 19      SNC=SNC+FLOAT(NC)
 !
-1   CALL AVERP(POM(MM),POMG,PSM(MM),PSMG,MM,1)
+        CALL AVERP(POM(MM),POMG,PSM(MM),PSMG,MM,1)
+end do
 !
 !             END OF HISTORY LOOP
 !             MONTE CARLO RESULTS
@@ -293,10 +300,11 @@ subroutine musc(COMM,ZL,SGI,SGL,AP,UM,A,AB,BE,PE,TEFF,SPIN,NL,AA,RC,GG,D,S,SI, &
     TMC=0.
     SGM=0.
     STM=0.
-    DO 22 M=1,NS
+    do M=1,NS
         TMC=TMC+TM(M)
         SGM=SGM+SGMC(M)
-22  STM=STM+STMC(M)
+        STM=STM+STMC(M)
+    end do
     TMC=TMC/FLOAT(NS)
     SGM=SGM/FLOAT(NS)
     STM=STM/FLOAT(NS)
@@ -305,21 +313,23 @@ subroutine musc(COMM,ZL,SGI,SGL,AP,UM,A,AB,BE,PE,TEFF,SPIN,NL,AA,RC,GG,D,S,SI, &
     SNC=SNC/ZH(K)
     ZSIR=ZSIR/(ZH(K)*SGM)
 !             STATISTICAL UNCERTAINTIES
-    DO 23 M=1,NS
+    do M=1,NS
         DTMC=DTMC+(TM(M)-TMC)**2
         SIM=SIM+(SGMC(M)-SGM)**2
-23  SYM=SYM+(STMC(M)-STM)**2
+        SYM=SYM+(STMC(M)-STM)**2
+    end do
     B11=0.
     B12=0.
     B23=0.
     BBOTH=0.
-    DO 15 M=1,MM
+    do M=1,MM
         BBOTH=BBOTH+(POM(M)+PSM(M)-PO-PS)*(SGMC(M)-SGM)
         IF(ITYPE.EQ.4)B12=B12+(POM(M)+PSM(M)-PO-PS)*(STMC(M)-STM)
         IF(ITYPE.EQ.4)B23=B23+(STMC(M)-STM)*(SGMC(M)-SGM)
                       B11=B11+(POM(M)-PO)*(PSM(M)-PS)
         SAM=SAM+(POM(M)-PO)**2
-15  SEM=SEM+(PSM(M)-PS)**2
+        SEM=SEM+(PSM(M)-PS)**2
+    end do
     DYN=FLOAT(NS*(NS-1))
     DTMC=SQRT(DTMC/DYN)
     DSGM=SQRT(SIM/DYN)
@@ -348,18 +358,18 @@ subroutine musc(COMM,ZL,SGI,SGL,AP,UM,A,AB,BE,PE,TEFF,SPIN,NL,AA,RC,GG,D,S,SI, &
     SUMSG=0.
     SUMT =0.
     SUMF0=0.
-    DO 54 IZ=1,101
-    SUMST=SUMST+ZST(IZ)
-    SUMSG=SUMSG+ZSG(IZ)
-    SUMT =SUMT + ZT(IZ)
-    SUMF0=SUMF0+ZST(IZ)
-54  CONTINUE
-    DO 55 IZ=1,101
+    do IZ=1,101
+        SUMST=SUMST+ZST(IZ)
+        SUMSG=SUMSG+ZSG(IZ)
+        SUMT =SUMT + ZT(IZ)
+        SUMF0=SUMF0+ZST(IZ)
+    end do 
+    do IZ=1,101
         ZST(IZ)=ZST(IZ)/SUMST
         ZSG(IZ)=ZSG(IZ)/SUMSG
         ZT(IZ)=ZT(IZ)/SUMT
         ZF0(IZ)=ZF0(IZ)/SUMF0
-55  CONTINUE
+    end do
     WRITE(8,198)ZSIR
 198 FORMAT(/1PE15.3/)
     WRITE(8,199)(IZ,ZST(IZ),ZSG(IZ),ZT(IZ),ZF0(IZ),IZ=1,101)
