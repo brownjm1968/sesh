@@ -54,20 +54,20 @@ program sesh
 
     implicit none
 !
-    real(4), allocatable, dimension(:) :: COMM,ZL,AP,UM,A,SC,ST,AB,BE,PE,TEFF, &
+    real(8), allocatable, dimension(:) :: COMM,ZL,AP,UM,A,SC,ST,AB,BE,PE,TEFF, &
                                           SPIN,AA,RC,XN,E,SG,SP,RN,RX,ZH,RB
     integer, allocatable, dimension(:) :: JX2,JN2,JMX,NL
-    real(4), allocatable, dimension(:,:) :: SGI,GG,D,S,SI,R,EFF,SUMGJ,STI,SPI
+    real(8), allocatable, dimension(:,:) :: SGI,GG,D,S,SI,R,EFF,SUMGJ,STI,SPI
     integer, allocatable, dimension(:,:) :: J2X,J2N
-    real(4), allocatable, dimension(:,:,:) :: SGL,G,GNR,GNRIN,DJL,STL,SPL
+    real(8), allocatable, dimension(:,:,:) :: SGL,G,GNR,GNRIN,DJL,STL,SPL
     integer, allocatable, dimension(:,:,:) :: LJX,LJN
 
-    real(4) :: AI,AK,CC,DPO,DPS,DSGM,DSSCF,DSTM,DTAU,DTMC,DUMMY,EDD,EDGG,EJL, &
+    real(8) :: AI,AK,CC,DPO,DPS,DSGM,DSSCF,DSTM,DTAU,DTMC,DUMMY,EDD,EDGG,EJL, &
                ETA,FJ,GN,GNIN,PL,PO,PS,PSI0,QI,RK,S3,SGM,SNC,SQ,SSCF,STM,SUM, &
-               TAU,TMC,U,V,VARJ2,VL,X2I,X2J,XNSS,XO,XX,ZP
+               TAU,TMC,U,V,VARJ2,VL,X2I,X2J,XNSS,XO,XX
 
     integer :: I,I2,IHIST,ITYPE,ITYPO,IY,J,J2,J2MN,J2MX,JX,K,KQ,KZ,L,LL,LX,M, &
-               M4,MJ,N,NE,NI,NN,NQ
+               M4,MJ,N,NE,NI,NN,NQ,numResPairs
 
 !    CHARACTER*26 CDATE
 ! FG051198
@@ -206,22 +206,20 @@ program sesh
 
 !             READ NUMBER OF RESONANCE PAIRS
 
-
-    READ(5,104)ZP
+    READ(5,104)numResPairs
 104 FORMAT(E10.5)
     DO 9 M=1,25
-    M4=(M-1)*4
+        M4=(M-1)*4
 
 !             READ ENERGIES (KEV) AND NUMBERS OF MONTE CARLO HISTORIES
 
-    READ(5,105)E(M4+1),ZH(M4+1),E(M4+2),ZH(M4+2) &
-                ,E(M4+3),ZH(M4+3),E(M4+4),ZH(M4+4)
-105 FORMAT(8E10.5)
-
+        READ(5,105)E(M4+1),ZH(M4+1),E(M4+2),ZH(M4+2) &
+                  ,E(M4+3),ZH(M4+3),E(M4+4),ZH(M4+4)
+105     FORMAT(8E10.5)
 
 !             BLANK CARD SIGNALS END OF INPUT
 
-    IF(E(M4+1).EQ.0.)GO TO 10
+        IF(E(M4+1).EQ.0.)GO TO 10
 9   CONTINUE
 
 
@@ -267,19 +265,19 @@ program sesh
 !             GILBERT-CAMERON MATCHING ENERGY
 
         AI=FLOAT(INT(A(I)+1.5))
-        write (6,*)'a= ',a(i),ai
+!        write (6,*)'a= ',a(i),ai
         UM(I)=2.5+150./AI
 
 !             FIND FERMI GAS MODEL A-PARAMETER FROM S-WAVE SPACING
 
         QI=SPIN(I)+.5
         U=BE(I)-PE(I)
-        CC=ALOG(0.2367E6*AI*U/(D(1,I)*QI))
+        CC=LOG(0.2367E6*AI*U/(D(1,I)*QI))
         XO=CC
         DO 12 M=1,12
             VARJ2=0.1460*XO*AI**(2./3.)
             FJ=.5*(EXP(-(QI-1.)/VARJ2)-EXP(-(QI+1.)/VARJ2))*VARJ2/QI
-            XX=CC-ALOG(FJ)+2.*ALOG(XO)
+            XX=CC-LOG(FJ)+2.*LOG(XO)
             IF(ABS(XX-XO).LT.1.E-6)GO TO 13
             XO=XX
 12      CONTINUE
@@ -349,8 +347,9 @@ program sesh
             SGI(I,K)=0.
             STI(I,K)=0.
             SPI(I,K)=0.
-            DO 17 L=1,4
-17          SGL(I,K,L)=0.
+            do L=1,4
+                SGL(I,K,L)=0.
+            end do
             AA(I)=(1.+1./A(I))**2
 
 !             GET ENERGY DEPENDENCE FACTORS FOR LEVEL SPACINGS AND
@@ -399,7 +398,7 @@ program sesh
 !                     FIND PSI-FUNCTION GIVING PORTER-THOMAS AVERAGE
                     ETA=SQRT((GG(L,I)*EDGG+GNIN)/(2.*GN*EDD))
 !
-                    CALL PFCN(0.,ETA,U,V,KZ)
+                    CALL PFCN(0.0d0,ETA,U,V,KZ)
 !
                     PSI0=1.77245  *ETA*U
 
@@ -648,7 +647,7 @@ program sesh
 !           CYLINDRICAL SAMPLE CAPTURE
 39          CALL MUSC(COMM,ZL,SGI,SGL,AP,UM,A,AB,BE,PE,TEFF,SPIN,NL,AA,RC,GG, &
                 D,S,SI,R,EFF,J2X,J2N,SUMGJ,XN,E,SG,SP,G,GNR,GNRIN,DJL,SSCF,DSSCF, &
-                N,K,I,L,J,NN,NE,NI,LX,RN,RX,ZH,PO,PS,DPO,DPS,ZP,SGM,STM,DSGM,DSTM, &
+                N,K,I,L,J,NN,NE,NI,LX,RN,RX,ZH,PO,PS,DPO,DPS,numResPairs,SGM,STM,DSGM,DSTM, &
                 TMC,DTMC,TAU,DTAU,SNC,XNSS,ITYPE,IHIST,LJX,LJN,JX2,JN2,JMX, RB)
 !
             GO TO 41
@@ -656,42 +655,42 @@ program sesh
 !           SPHERICAL SHELL CAPTURE
 40          CALL MUSS(COMM,ZL,SGI,SGL,AP,UM,A,AB,BE,PE,TEFF,SPIN,NL,AA,RC,GG, &
                 D,S,SI,R,EFF,J2X,J2N,SUMGJ,XN,E,SG,SP,G,GNR,GNRIN,DJL,SSCF,DSSCF, &
-                N,K,I,L,J,NN,NE,NI,LX,RN,RX,ZH,PO,PS,DPO,DPS,ZP,SGM,STM,DSGM,DSTM, &
+                N,K,I,L,J,NN,NE,NI,LX,RN,RX,ZH,PO,PS,DPO,DPS,numResPairs,SGM,STM,DSGM,DSTM, &
                 TMC,DTMC,TAU,DTAU,SNC,XNSS,ITYPE,IHIST,LJX,LJN,JX2,JN2,JMX, RB)
 !
             XN(N)=RX(N)-RN(N)
 41          IF(K.EQ.1) &
-                WRITE(8,117)XN(N),E(K),SGM,STM,PO,PS,SSCF,SNC, ZH(K),ZP,RX(N), &
+                WRITE(8,117)XN(N),E(K),SGM,STM,PO,PS,SSCF,SNC, ZH(K),numResPairs,RX(N), &
                 TMC  ,DSGM,DSTM,DPO,DPS,DSSCF,DTMC
             IF(K.GT.1) &
-                WRITE(8,118)      E(K),SGM,STM,PO,PS,SSCF,SNC, ZH(K),ZP,RX(N), &
+                WRITE(8,118)      E(K),SGM,STM,PO,PS,SSCF,SNC, ZH(K),numResPairs,RX(N), &
                 TMC  ,DSGM,DSTM,DPO,DPS,DSSCF,DTMC
                 WRITE(12,312)E(K),STM,DSTM,SGM,DSGM,SSCF,DSSCF
             GO TO 44
 !
 !           TRANSMISSION
-42          CALL MOCT(COMM,ZL,SGI,SGL,AP,UM,A,AB,BE,PE,TEFF,SPIN,NL,AA,RC,GG, &
-                D,S,SI,R,EFF,J2X,J2N,SUMGJ,XN,E,SG,SP,G,GNR,GNRIN,DJL,SSCF,DSSCF, &
-                N,K,I,L,J,NN,NE,NI,LX,RN,RX,ZH,PO,PS,DPO,DPS,ZP,SGM,STM,DSGM,DSTM, &
-                TMC,DTMC,TAU,DTAU,SNC,XNSS,ITYPE,IHIST,LJX,LJN,JX2,JN2,JMX, RB)
+42          CALL MOCT(AP,UM,A,AB,BE,PE,TEFF,NL,AA,RC,GG, &
+                R,EFF,J2X,J2N,XN,E,SG,SP,G,GNR,GNRIN,DJL, &
+                N,K,I,L,J,NI,LX,ZH,numResPairs,SGM,STM,DSGM,DSTM, &
+                TMC,DTMC,TAU,DTAU,IHIST,LJX,LJN,JN2,JMX)
 !
             IF(K.EQ.1) &
-                WRITE(8,119)XN(N),E(K),SGM,STM,TMC,TAU,ZH(K),ZP,DSGM,DSTM,DTMC,DTAU
+                WRITE(8,119)XN(N),E(K),SGM,STM,TMC,TAU,ZH(K),numResPairs,DSGM,DSTM,DTMC,DTAU
             IF(K.GT.1) &
-                WRITE(8,120)      E(K),SGM,STM,TMC,TAU,ZH(K),ZP,DSGM,DSTM,DTMC,DTAU
+                WRITE(8,120)      E(K),SGM,STM,TMC,TAU,ZH(K),numResPairs,DSGM,DSTM,DTMC,DTAU
             GO TO 44
 !
 !           SELF-INDICATION
 43          CALL MUSC(COMM,ZL,SGI,SGL,AP,UM,A,AB,BE,PE,TEFF,SPIN,NL,AA,RC,GG, &
                 D,S,SI,R,EFF,J2X,J2N,SUMGJ,XN,E,SG,SP,G,GNR,GNRIN,DJL,SSCF,DSSCF, &
-                N,K,I,L,J,NN,NE,NI,LX,RN,RX,ZH,PO,PS,DPO,DPS,ZP,SGM,STM,DSGM,DSTM, &
+                N,K,I,L,J,NN,NE,NI,LX,RN,RX,ZH,PO,PS,DPO,DPS,numResPairs,SGM,STM,DSGM,DSTM, &
                 TMC,DTMC,TAU,DTAU,SNC,XNSS,ITYPE,IHIST,LJX,LJN,JX2,JN2,JMX, RB)
 !
             IF(K.EQ.1) &
-                WRITE(8,121)XN(N),E(K),SGM,STM,PO,PS,SSCF,SNC, ZH(K),ZP,RX(N), &
+                WRITE(8,121)XN(N),E(K),SGM,STM,PO,PS,SSCF,SNC, ZH(K),numResPairs,RX(N), &
                 RN(N),DSGM,DSTM,DPO,DPS,DSSCF
             IF(K.GT.1) &
-                WRITE(8,122)      E(K),SGM,STM,PO,PS,SSCF,SNC, ZH(K),ZP,RX(N), &
+                WRITE(8,122)      E(K),SGM,STM,PO,PS,SSCF,SNC, ZH(K),numResPairs,RX(N), &
                 RN(N),DSGM,DSTM,DPO,DPS,DSSCF
 117         FORMAT(/ &
             1PE10.3,0PF7.3,1PE11.3,2E10.3,3E13.3,0P,2F10.0,1X,1P,2E10.3/ &
