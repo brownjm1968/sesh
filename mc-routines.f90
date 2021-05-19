@@ -377,33 +377,33 @@ end do
     RETURN
 end subroutine musc
 !
-subroutine muss(COMM,ZL,SGI,SGL,AP,UM,A,AB,BE,PE,TEFF,SPIN,NL,AA,RC,GG,D,S,SI, &
-                R,EFF,J2X,J2N,SUMGJ,XN,E,SG,SP,G,GNR,GNRIN,DJL,SSCF,DSSCF,N,K, &
-                I,L,J,NN,NE,NI,LX,RN,RX,ZH,PO,PS,DPO,DPS,numResPairs,SGM,STM,DSGM,DSTM, &
-                TMC,DTMC,TAU,DTAU,SNC,XNSS,ITYPE,IHIST,LJX,LJN,JX2,JN2,JMX, RB)
+subroutine muss(AP,UM,A,AB,BE,PE,TEFF,NL,AA,RC,GG, &
+                R,EFF,J2X,J2N,E,SG,SP,G,GNR,GNRIN,DJL,SSCF,DSSCF,N,K, &
+                I,L,J,NI,LX,RN,RX,ZH,PO,PS,DPO,DPS,numResPairs,SGM,STM,DSGM,DSTM, &
+                TMC,DTMC,SNC,XNSS,ITYPE,IHIST,LJX,LJN,JN2,JMX)
 
     implicit none
 !             MUSS YIELDS THE MULTIPLE SCATTERING CORRECTION FOR A
 !             SPHERICAL SHELL (MONTE CARLO)
 
-    real(8), allocatable, dimension(:) :: COMM,ZL,AP,UM,A,SS,STT,AB,BE,PE,TEFF, &
-                              SPIN,AA,RC,XN,E,SG,SP,RN,RX,ZH,RB,ZST,ZSG,ZT,ZF0, &
+    real(8), allocatable, dimension(:) :: AP,UM,A,SS,STT,AB,BE,PE,TEFF, &
+                              AA,RC,E,SG,SP,RN,RX,ZH,ZST,ZSG,ZT,ZF0, &
                               GNL,EE,STMC,SGMC,TM,PSM,POM
-    integer, allocatable, dimension(:) :: NL,JX2,JN2,JMX
-    real(8), allocatable, dimension(:,:) :: SGI,GG,D,S,SI,R,EFF,SUMGJ,DOP
+    integer, allocatable, dimension(:) :: NL,JN2,JMX
+    real(8), allocatable, dimension(:,:) :: GG,R,EFF,DOP
     integer, allocatable, dimension(:,:) :: J2X,J2N
-    real(8), allocatable, dimension(:,:,:) :: SGL,G,GNR,GNRIN,DJL,SINE,COSE,PLE,GGE
+    real(8), allocatable, dimension(:,:,:) :: G,GNR,GNRIN,DJL,SINE,COSE,PLE,GGE
     integer, allocatable, dimension(:,:,:) :: LJX,LJN
     real(8), allocatable, dimension(:,:,:,:) :: DE,GNE,GNINE
 
-    real(8) :: A1,A2,AK,B1,B11,B12,B2,B23,B3,BBOTH,C0,CG,CT,CTH,CTHC, &
-               DD,DEN,DPO,DPS,DSGM,DSSCF,DSTM,DTAU,DTMC,DUMMY,DYN,EDD,EDGG,ETA, &
-               EXN1,FE,FP,GNINS,GNS,GT,H,HNEG,HPOS,O,PHI,PO,POMG,PS,PSMG,RHO,   &
+    real(8) :: A1,A2,B11,B12,B23,BBOTH,C0,CG,CT,CTH, &
+               DD,DEN,DPO,DPS,DSGM,DSSCF,DSTM,DTMC,DYN,EDD,EDGG,ETA, &
+               FE,GNINS,GNS,GT,H,HNEG,HPOS,PO,POMG,PS,PSMG,   &
                RK,SAM,SC,SCC,SEM,SGM,SIM,SN,SNC,SOM,SQ,SSCF,ST,STH,STM,SUM,     &
-               SUMF0,SUMSG,SUMST,SUMT,SYM,T,TAU,TF,TMC,TP,TX,U,UU,V,VL,VV,W,WG, &
-               WI,WN,X,XI,XNSS,Y,Z,ZSIR,Q
+               SUMF0,SUMSG,SUMST,SUMT,SYM,T,TMC,TX,UU,VL,VV,W,WG, &
+               WI,WN,XI,XNSS,Z,Q
     integer :: I,IHIST,ITYPE,IZ,J,JL,JX,K,KZ,L,L1,L2,LP,LX,M,MCHD,MDIV,MM,MP,N, &
-               NC,NE,NH,NI,NN,NP,NS,numResPairs
+               NC,NH,NI,NP,NS,numResPairs
 
     allocate(SS(100),STT(100),ZST(101),ZSG(101),ZT(101),ZF0(101),GNL(8),        &
              COSE(10,4,10),SINE(10,4,10),EE(10),STMC(1000),SGMC(1000),TM(1000), &
@@ -698,7 +698,7 @@ subroutine moct(AP,UM,A,AB,BE,PE,TEFF,NL,AA,RC,GG,R,EFF,J2X,J2N,XN,E,SG,SP,G,   
 !             MOCT  YIELDS THE SELF-SHIELDING CORRECTION FACTOR AND
 !             TRANSMISSION FOR A CYLINDRICAL SAMPLE
 
-    real(8), allocatable, dimension(:) :: ZL,AP,UM,A,STT,AB,BE,PE,TEFF,AA,RC,   &
+    real(8), allocatable, dimension(:) :: AP,UM,A,STT,AB,BE,PE,TEFF,AA,RC,   &
                                           XN,E,SG,SP,ZH,ZST,ZSG,ZT,GNL,TMCG,TN, &
                                           SGMC,STMC,DOP
     integer, allocatable, dimension(:) :: NL,JN2,JMX

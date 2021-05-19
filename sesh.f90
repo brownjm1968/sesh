@@ -207,7 +207,7 @@ program sesh
 !             READ NUMBER OF RESONANCE PAIRS
 
     READ(5,104)numResPairs
-104 FORMAT(E10.5)
+104 FORMAT(I10)
     DO 9 M=1,25
         M4=(M-1)*4
 
@@ -653,17 +653,17 @@ program sesh
             GO TO 41
 !
 !           SPHERICAL SHELL CAPTURE
-40          CALL MUSS(COMM,ZL,SGI,SGL,AP,UM,A,AB,BE,PE,TEFF,SPIN,NL,AA,RC,GG, &
-                D,S,SI,R,EFF,J2X,J2N,SUMGJ,XN,E,SG,SP,G,GNR,GNRIN,DJL,SSCF,DSSCF, &
-                N,K,I,L,J,NN,NE,NI,LX,RN,RX,ZH,PO,PS,DPO,DPS,numResPairs,SGM,STM,DSGM,DSTM, &
-                TMC,DTMC,TAU,DTAU,SNC,XNSS,ITYPE,IHIST,LJX,LJN,JX2,JN2,JMX, RB)
+40          CALL MUSS(AP,UM,A,AB,BE,PE,TEFF,NL,AA,RC,GG, &
+                R,EFF,J2X,J2N,E,SG,SP,G,GNR,GNRIN,DJL,SSCF,DSSCF, &
+                N,K,I,L,J,NI,LX,RN,RX,ZH,PO,PS,DPO,DPS,numResPairs,SGM,STM,DSGM,DSTM, &
+                TMC,DTMC,SNC,XNSS,ITYPE,IHIST,LJX,LJN,JN2,JMX)
 !
             XN(N)=RX(N)-RN(N)
 41          IF(K.EQ.1) &
-                WRITE(8,117)XN(N),E(K),SGM,STM,PO,PS,SSCF,SNC, ZH(K),numResPairs,RX(N), &
+                WRITE(8,117)XN(N),E(K),SGM,STM,PO,PS,SSCF,SNC, ZH(K),float(numResPairs),RX(N), &
                 TMC  ,DSGM,DSTM,DPO,DPS,DSSCF,DTMC
             IF(K.GT.1) &
-                WRITE(8,118)      E(K),SGM,STM,PO,PS,SSCF,SNC, ZH(K),numResPairs,RX(N), &
+                WRITE(8,118)      E(K),SGM,STM,PO,PS,SSCF,SNC, ZH(K),float(numResPairs),RX(N), &
                 TMC  ,DSGM,DSTM,DPO,DPS,DSSCF,DTMC
                 WRITE(12,312)E(K),STM,DSTM,SGM,DSGM,SSCF,DSSCF
             GO TO 44
@@ -675,9 +675,9 @@ program sesh
                 TMC,DTMC,TAU,DTAU,IHIST,LJX,LJN,JN2,JMX)
 !
             IF(K.EQ.1) &
-                WRITE(8,119)XN(N),E(K),SGM,STM,TMC,TAU,ZH(K),numResPairs,DSGM,DSTM,DTMC,DTAU
+                WRITE(8,119)XN(N),E(K),SGM,STM,TMC,TAU,ZH(K),float(numResPairs),DSGM,DSTM,DTMC,DTAU
             IF(K.GT.1) &
-                WRITE(8,120)      E(K),SGM,STM,TMC,TAU,ZH(K),numResPairs,DSGM,DSTM,DTMC,DTAU
+                WRITE(8,120)      E(K),SGM,STM,TMC,TAU,ZH(K),float(numResPairs),DSGM,DSTM,DTMC,DTAU
             GO TO 44
 !
 !           SELF-INDICATION
