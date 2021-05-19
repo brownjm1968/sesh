@@ -1,10 +1,10 @@
 module mc_routines
     contains
 
-subroutine musc(COMM,ZL,SGI,SGL,AP,UM,A,AB,BE,PE,TEFF,SPIN,NL,AA,RC,GG,D,S,SI, &
-                R,EFF,J2X,J2N,SUMGJ,XN,E,SG,SP,G,GNR,GNRIN,DJL,SSCF,DSSCF,N,K, &
-                I,L,J,NN,NE,NI,LX,RN,RX,ZH,PO,PS,DPO,DPS,numResPairs,SGM,STM,DSGM,DSTM, &
-                TMC,DTMC,TAU,DTAU,SNC,XNSS,ITYPE,IHIST,LJX,LJN,JX2,JN2,JMX, RB)
+subroutine musc(AP,UM,A,AB,BE,PE,TEFF,NL,AA,RC,GG, &
+                R,EFF,J2X,J2N,XN,E,SG,SP,G,GNR,GNRIN,DJL,SSCF,DSSCF,N,K, &
+                I,L,J,NI,LX,RN,RX,ZH,PO,PS,DPO,DPS,numResPairs,SGM,STM,DSGM,DSTM, &
+                TMC,DTMC,SNC,ITYPE,IHIST,LJX,LJN,JN2,JMX, RB)
 
     implicit none
 !             MUSC  YIELDS THE MULTIPLE SCATTERING CORRECTION FOR A
@@ -14,24 +14,24 @@ subroutine musc(COMM,ZL,SGI,SGL,AP,UM,A,AB,BE,PE,TEFF,SPIN,NL,AA,RC,GG,D,S,SI, &
 !                RB(N)      NEUTRON BEAM RADIUS
 !                RN(N)      FILTER  SAMPLE THICKNESS
     
-    real(8), allocatable, dimension(:) :: COMM,ZL,AP,UM,A,SS,STT,AB,BE,PE,TEFF, &
-                              SPIN,AA,RC,XN,E,SG,SP,RN,RX,ZH,RB,ZST,ZSG,ZT,ZF0, &
+    real(8), allocatable, dimension(:) :: AP,UM,A,SS,STT,AB,BE,PE,TEFF, &
+                              AA,RC,XN,E,SG,SP,RN,RX,ZH,RB,ZST,ZSG,ZT,ZF0, &
                               GNL,PSM,POM,EE,STMC,SGMC,TM
-    integer, allocatable, dimension(:) :: NL,JX2,JN2,JMX
-    real(8), allocatable, dimension(:,:) :: SGI,GG,D,S,SI,R,EFF,SUMGJ,DOP
+    integer, allocatable, dimension(:) :: NL,JN2,JMX
+    real(8), allocatable, dimension(:,:) :: GG,R,EFF,DOP
     integer, allocatable, dimension(:,:) :: J2X,J2N
-    real(8), allocatable, dimension(:,:,:) :: SGL,G,GNR,GNRIN,DJL,SINE,COSE,PLE,GGE
+    real(8), allocatable, dimension(:,:,:) :: G,GNR,GNRIN,DJL,SINE,COSE,PLE,GGE
     integer, allocatable, dimension(:,:,:) :: LJX,LJN
     real(8), allocatable, dimension(:,:,:,:) :: DE,GNE,GNINE
 
     real(8) :: AK,B1,B11,B12,B2,B23,B3,BBOTH,C0,CG,CT,CTH,CTHC,DD,  &
-               DEN,DPO,DPS,DSGM,DSSCF,DSTM,DTAU,DTMC,DUMMY,DYN,EDD,EDGG,ETA,  &
+               DEN,DPO,DPS,DSGM,DSSCF,DSTM,DTMC,DUMMY,DYN,EDD,EDGG,ETA,  &
                EXN1,FE,FP,GNINS,GNS,GT,H,HNEG,HPOS,O,PHI,PO,POMG,PS,PSMG,RHO, &
                RK,SAM,SC,SCC,SEM,SGM,SIM,SN,SNC,SOM,SQ,SSCF,ST,STH,STM,SUM,   &
-               SUMF0,SUMSG,SUMST,SUMT,SYM,T,TAU,TF,TMC,TP,TX,U,UU,V,VL,VV,W,  &
-               WG,WI,WN,X,XI,XNSS,Y,Z,ZSIR
+               SUMF0,SUMSG,SUMST,SUMT,SYM,T,TF,TMC,TP,TX,U,UU,V,VL,VV,W,  &
+               WG,WI,WN,X,XI,Y,Z,ZSIR
     integer :: I,IHIST,ITYPE,IZ,J,JL,JX,K,KZ,L,L1,L2,LP,LX,M,MCHD,MDIV,MM,MP,N, &
-               NC,NE,NH,NI,NN,NP,NS,numResPairs
+               NC,NH,NI,NP,NS,numResPairs
 
     allocate(SS(100),STT(100),ZST(101),ZSG(101),ZT(101),ZF0(101),GNL(8),      &
              COSE(10,4,10),SINE(10,4,10),DE(10,8,4,10),GNE(10,8,4,10),        &

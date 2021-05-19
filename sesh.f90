@@ -69,10 +69,6 @@ program sesh
     integer :: I,I2,IHIST,ITYPE,ITYPO,IY,J,J2,J2MN,J2MX,JX,K,KQ,KZ,L,LL,LX,M, &
                M4,MJ,N,NE,NI,NN,NQ,numResPairs
 
-!    CHARACTER*26 CDATE
-! FG051198
-    CHARACTER*30 CDATE
-! modification for HP on bonsai3
 ! ---- Jesse Mod --------------------------------------------------------------
     CHARACTER (LEN=100) :: inp_file_name
     CHARACTER (LEN=100) :: out_file_name
@@ -286,7 +282,7 @@ program sesh
 !             DETERMINE MINIMUM AND MAXIMUM COMPOUND SPIN POSSIBLE
 
         X2I=2.*SPIN(I)
-        I2=X2I+.01
+        I2=int(X2I+.01)
         LX=NL(I)
         DO 15 L=1,LX
         J2X(L,I)=I2+2*L-1
@@ -582,7 +578,7 @@ program sesh
     DO 36 I=1,NI
         LX=NL(I)
 !             TWICE EXTREME COMPOUND SPIN QUANTUM NUMBERS
-        I2=2.*SPIN(I)
+        I2=int(2.*SPIN(I) + 0.01)
         JX2(I)=I2+2*LX-1
         JN2(I)=I2-2*LX+1
         IF(I2.GT.6)GO TO 26
@@ -645,10 +641,10 @@ program sesh
             GO TO (39,40,42,43),ITYPE
 !           39 xx and 43 off to shut off multiple scattering (39, 40, 42, 43)
 !           CYLINDRICAL SAMPLE CAPTURE
-39          CALL MUSC(COMM,ZL,SGI,SGL,AP,UM,A,AB,BE,PE,TEFF,SPIN,NL,AA,RC,GG, &
-                D,S,SI,R,EFF,J2X,J2N,SUMGJ,XN,E,SG,SP,G,GNR,GNRIN,DJL,SSCF,DSSCF, &
-                N,K,I,L,J,NN,NE,NI,LX,RN,RX,ZH,PO,PS,DPO,DPS,numResPairs,SGM,STM,DSGM,DSTM, &
-                TMC,DTMC,TAU,DTAU,SNC,XNSS,ITYPE,IHIST,LJX,LJN,JX2,JN2,JMX, RB)
+39          CALL MUSC(AP,UM,A,AB,BE,PE,TEFF,NL,AA,RC,GG, &
+                R,EFF,J2X,J2N,XN,E,SG,SP,G,GNR,GNRIN,DJL,SSCF,DSSCF, &
+                N,K,I,L,J,NI,LX,RN,RX,ZH,PO,PS,DPO,DPS,numResPairs,SGM,STM,DSGM,DSTM, &
+                TMC,DTMC,SNC,ITYPE,IHIST,LJX,LJN,JN2,JMX, RB)
 !
             GO TO 41
 !
@@ -681,10 +677,10 @@ program sesh
             GO TO 44
 !
 !           SELF-INDICATION
-43          CALL MUSC(COMM,ZL,SGI,SGL,AP,UM,A,AB,BE,PE,TEFF,SPIN,NL,AA,RC,GG, &
-                D,S,SI,R,EFF,J2X,J2N,SUMGJ,XN,E,SG,SP,G,GNR,GNRIN,DJL,SSCF,DSSCF, &
-                N,K,I,L,J,NN,NE,NI,LX,RN,RX,ZH,PO,PS,DPO,DPS,numResPairs,SGM,STM,DSGM,DSTM, &
-                TMC,DTMC,TAU,DTAU,SNC,XNSS,ITYPE,IHIST,LJX,LJN,JX2,JN2,JMX, RB)
+43          CALL MUSC(AP,UM,A,AB,BE,PE,TEFF,NL,AA,RC,GG, &
+                R,EFF,J2X,J2N,XN,E,SG,SP,G,GNR,GNRIN,DJL,SSCF,DSSCF, &
+                N,K,I,L,J,NI,LX,RN,RX,ZH,PO,PS,DPO,DPS,numResPairs,SGM,STM,DSGM,DSTM, &
+                TMC,DTMC,SNC,ITYPE,IHIST,LJX,LJN,JN2,JMX, RB)
 !
             IF(K.EQ.1) &
                 WRITE(8,121)XN(N),E(K),SGM,STM,PO,PS,SSCF,SNC, ZH(K),numResPairs,RX(N), &
