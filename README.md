@@ -4,13 +4,13 @@
 # Getting Started
 ------------------------
 
-Requirements:
+<u>Requirements</u>:
 - Fortran compiler: `gfortran` (gcc 10.2)
 
-To compile:
+<u>To compile</u>:
 - Run `compile-sesh.sh`
 
-To run executable:
+<u>To run executable</u>:
 
 Open bash-like terminal and run:
 
