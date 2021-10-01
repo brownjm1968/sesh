@@ -675,6 +675,7 @@ program sesh
 45      CONTINUE
 46  CONTINUE
 !    GO TO 1     ! JMB: I don't know why this was here
+print *, new_line('a')," sesh is done!",new_line('a')
 999 STOP  
 end program sesh
 !
