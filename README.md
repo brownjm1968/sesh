@@ -6,6 +6,10 @@ the Self-shielding and Multiple Scattering Effects For Neutron Cross Section Dat
 the Unresolved Resonance Region", Report GA-8380 (1968). This code has been adapted over the years 
 from the input of several nuclear data researchers and their contributions are appreciated.
 
+`sesh` solves the problem of resonance self-shielding, the experimental effect seen in time-of-flight
+experiments where the measured time/energy-averaged transmission data cannot be compared directly to 
+theoretical cross section due to the inequality: \<f(x)\> != f(\<x\>) for non-linear equations.
+
 ------------------------
 # Getting Started
 ------------------------
