@@ -1,8 +1,8 @@
 CC ---------------------------------------------------------------------    
-CC Modified for AIX xlf Fortran compiler  ( Klaus Berthold, IRMM 4/94)
+CC Modified for AIX xlf Fortran compiler  (4/94)
 CC ---------------------------------------------------------------------    
 CC
-CC(Revised and extended by Konstantin Volev, IRMM 5/2002 )
+CC(Revised and extended 5/2002 )
 CC
 CC MAIN :  107 FORMAT Statements  (no more using Hollerith count)
 CC         109 
@@ -23,7 +23,7 @@ CC
 CC SUBROUTINE SPACE:    RANDU not intrinsic so added SUBROUTINE RANDU 
 CC 
 CC ---------------------------------------------------------------------    
-C     SESH MAIN PROGRAM (KFK VERSION 1975, EXPERIMENTAL COPY 1994)
+C     SESH MAIN PROGRAM ( 1975, EXPERIMENTAL COPY 1994)
 C
 C     MANUAL: F.H. FROEHNER,
 C             "SESH - A FORTRAN IV CODE FOR CALCULATING THE SELF-
