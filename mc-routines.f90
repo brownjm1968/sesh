@@ -288,7 +288,7 @@ subroutine musc(AP,UM,A,AB,BE,PE,TEFF,NL,AA,RC,GG, &
 19      SNC=SNC+FLOAT(NC)
 !
         CALL AVERP(POM(MM),POMG,PSM(MM),PSMG,MM,1)
-end do
+    end do
 !
 !             END OF HISTORY LOOP
 !             MONTE CARLO RESULTS

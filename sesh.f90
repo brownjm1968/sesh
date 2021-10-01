@@ -1,29 +1,5 @@
 program sesh
-!C ---------------------------------------------------------------------    
-!C Modified for AIX xlf Fortran compiler  ( Klaus Berthold, IRMM 4/94)
-!C ---------------------------------------------------------------------    
-!C
-!C(Revised and extended by Konstantin Volev, IRMM 5/2002 )
-!C
-!C MAIN :  107 FORMAT Statements  (no more using Hollerith count)
-!C         109 
-!C         113  
-!C         114
-!C         115
-!C         116
-!C
-!C         COMMON BLOCK : CHARACTER*26 CDATE
-!C 
-!C SUBROUTINE MUSC :  3 CONTINUE (one removed)
-!C                    3 CONTINUE 
-!C 
-!C SUBROUTINE MOCT :    PLOT(....) commented out
-!C  
-!C FUNCTION RHO    :    CBRT not intrinsic so added FUNCTION CBRT
-!C
-!C 
-!C ---------------------------------------------------------------------    
-!     SESH MAIN PROGRAM (KFK VERSION 1975, EXPERIMENTAL COPY 1994)
+!     SESH MAIN PROGRAM 
 !
 !     MANUAL: F.H. FROEHNER,
 !             "SESH - A FORTRAN IV CODE FOR CALCULATING THE SELF-
@@ -95,12 +71,11 @@ program sesh
     print *, "Correction file name?"
     read(*,*) cor_file_name
 ! -----------------------------------------------------------------------------
-    open (unit=5,file=inp_file_name,status='old')           ! -- Input file
-    open (unit=8,file=out_file_name,status='unknown')       ! -- Main output file
-    open (unit=11,file=results_file_name,status='unknown')  ! -- Formatted partial wave cross section output (analytical calc.))
-    open (unit=12, file=cor_file_name, status='unknown')    ! -- Formatted self-shielding correction factor output
+    open (unit=5,  file=inp_file_name,    status='old')     ! -- Input file
+    open (unit=8,  file=out_file_name,    status='unknown') ! -- Main output file
+    open (unit=11, file=results_file_name,status='unknown') ! -- Formatted partial wave cross section output (analytical calc.))
+    open (unit=12, file=cor_file_name,    status='unknown') ! -- Formatted self-shielding correction factor output
     call random_seed
-! end modification for HP on bonsai3
 !
 !             READ INPUT
 !             IHIST IS A TAG FOR HISTOGRAMS OF ST, SG, T, F0;
@@ -113,7 +88,7 @@ program sesh
 100 FORMAT(18A4,1I8)
     SUM=0.
     I=0
-    2 I=I+1
+    I=I+1
 !             I-TH ISOTOPE (MAXIMUM OF 10 ISOTOPES):
 !             NUCLEON NUMBER A(I), ABUNDANCE AB(I), BINDING ENERGY BE(I) [MeV], PAIRING
 !             ENERGY PE(I) [MeV], EFFECTIVE SAMPLE TEMPERATURE  TEFF(I) [DEG. K],
@@ -227,14 +202,6 @@ program sesh
 11  CONTINUE
 
 !             WRITE INPUT HEADING
-!C    VMS SPECIFIC DATE AND TIME PROCEDURES
-!      CALL FDATE_(CDATE)
-! FG051198
-! modification for HP on bonsai3
-!     CALL FDATE(CDATE)
-!     WRITE(8,106)CDATE,COMM
-! 106 FORMAT(1H1,//,'[UNIX-SESH ',A24,']     ',18A4)
-! end modification for HP on bonsai3
     WRITE(8,107)
 107 FORMAT( &
     ' I N P U T '/ &
@@ -707,13 +674,12 @@ program sesh
 44          CONTINUE
 45      CONTINUE
 46  CONTINUE
-    GO TO 1
+!    GO TO 1     ! JMB: I don't know why this was here
 999 STOP  
 end program sesh
 !
 !--------------------------- END MAIN ---------------------------------
 !
-!end program sesh
 
 
 
