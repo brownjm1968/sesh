@@ -1,16 +1,22 @@
 `sesh` calculates corrections for time-of-flight experimental data.
 
+The code `sesh` presented here is a modernized version of SESH re-written in Modern Fortran.
+Original code is by F.H. Froehner published in the report: "SESH - A Fortran IV Code For Calculating 
+the Self-shielding and Multiple Scattering Effects For Neutron Cross Section Data Interpretation in 
+the Unresolved Resonance Region", Report GA-8380 (1968). This code has been adapted over the years 
+from the input of several nuclear data researchers and their contributions are appreciated.
+
 ------------------------
 # Getting Started
 ------------------------
 
-<u>Requirements</u>:
+**Requirements**:
 - Fortran compiler: `gfortran` (gcc 10.2)
 
-<u>To compile</u>:
+**To compile**:
 - Run `compile-sesh.sh`
 
-<u>To run executable</u>:
+**To run executable**:
 
 Open bash-like terminal and run:
 
@@ -28,5 +34,5 @@ sesh < auto-in
 # Input Files
 
 An input file called `ta181.inp` is given as an example for SESH input. The SESH input is more
-fully defined in the report by F. Frohner described [here](https://www.osti.gov/biblio/4554018).
+fully defined in the report by F. Froehner described [here](https://www.osti.gov/biblio/4554018).
 

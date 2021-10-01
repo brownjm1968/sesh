@@ -1,0 +1,41 @@
+---
+code_id: 65216
+open_source: true
+repository_link: "https://github.com/brownjm1968/sesh"
+accessibility: "OS"
+software_type: "S"
+developers:
+- email: ""
+  orcid: ""
+  first_name: "Fritz"
+  last_name: "Froehner"
+  middle_name: ""
+  affiliations: []
+- email: ""
+  orcid: ""
+  first_name: "Jesse"
+  last_name: "Brown"
+  middle_name: ""
+  affiliations: []
+contributors: []
+sponsoring_organizations: []
+contributing_organizations: []
+research_organizations: []
+related_identifiers: []
+award_dois: []
+software_title: "sesh"
+acronym: "sesh"
+doi: "10.11578/dc.20211001.4"
+description: "`sesh` calculates resonance self-shielding corrections for time-of-flight\
+  \ experimental data"
+programming_languages:
+- "Fortran"
+country_of_origin: "United States"
+licenses:
+- "BSD 3-clause \"New\" or \"Revised\" License"
+date_record_added: "2021-10-01"
+date_record_updated: "2021-10-01"
+links:
+- rel: "citation"
+  href: "https://www.osti.gov/doecode/biblio/65216"
+is_migration: false
