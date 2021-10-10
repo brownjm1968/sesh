@@ -1,4 +1,5 @@
 
-gfortran -Wall -c mc-routines.f90
 
-gfortran -Wall sesh.f90 mc-routines.o -o sesh
+INSTALL_PATH=${PWD}/install
+
+cmake -D CMAKE_INSTALL_PREFIX:FILEPATH=${INSTALL_PATH} $*

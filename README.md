@@ -17,8 +17,20 @@ theoretical cross section due to the inequality: \<f(x)\> != f(\<x\>) for non-li
 **Requirements**:
 - Fortran compiler: `gfortran` (gcc 10.2)
 
+It should work with other compilers, but has only recently been tested with `gfortran`.
+
 **To compile**:
-- Run `compile-sesh.sh`
+
+Run the following in a bash-like terminal starting in the sesh main project directory:
+
+```sh
+mkdir build
+cd build
+../compile-sesh.sh ../
+make
+```
+
+This will put the `sesh` executable in your `sesh/build/` directory.
 
 **To run executable**:
 
@@ -29,10 +41,11 @@ sesh
 ```
 
 which will prompt you for input and output file names. If you have already defined these names
-in a dedicated file like `auto-in`, you can simply run:
+in a dedicated file like `auto-in`, you can simply run `sesh < auto-in`. To run the example file 
+provided, from the `sesh/build/` directory run:
 
 ```sh
-sesh < auto-in
+sesh < ../auto-in
 ```
 
 # Input Files
