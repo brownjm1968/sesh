@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(hello)
+project(SESH)
 enable_language(Fortran)
 
 if(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
