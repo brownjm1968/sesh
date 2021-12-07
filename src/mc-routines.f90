@@ -1,7 +1,7 @@
 module mc_routines
     contains
 
-subroutine musc(AP,UM,A,AB,BE,PE,TEFF,NL,AA,RC,GG, &
+subroutine musc(AP,UM,A,abundance,BE,PE,eff_temp,NL,AA,RC,GG, &
                 R,EFF,J2X,J2N,XN,E,SG,SP,G,GNR,GNRIN,DJL,SSCF,DSSCF,N,K, &
                 I,L,J,NI,LX,RN,RX,ZH,PO,PS,DPO,DPS,numResPairs,SGM,STM,DSGM,DSTM, &
                 TMC,DTMC,SNC,ITYPE,IHIST,LJX,LJN,JN2,JMX, RB)
@@ -14,7 +14,7 @@ subroutine musc(AP,UM,A,AB,BE,PE,TEFF,NL,AA,RC,GG, &
 !                RB(N)      NEUTRON BEAM RADIUS
 !                RN(N)      FILTER  SAMPLE THICKNESS
     
-    real(8), allocatable, dimension(:) :: AP,UM,A,SS,STT,AB,BE,PE,TEFF, &
+    real(8), allocatable, dimension(:) :: AP,UM,A,SS,STT,abundance,BE,PE,eff_temp, &
                               AA,RC,XN,E,SG,SP,RN,RX,ZH,RB,ZST,ZSG,ZT,ZF0, &
                               GNL,PSM,POM,EE,STMC,SGMC,TM
     integer, allocatable, dimension(:) :: NL,JN2,JMX
@@ -67,7 +67,7 @@ subroutine musc(AP,UM,A,AB,BE,PE,TEFF,NL,AA,RC,GG, &
         IF(NC.GT.1)EE(NC)=EE(NC-1)*FE
         do I=1,NI
     ! ---- Doppler? -------------------------------------------------------
-            DOP(NC,I)=SQRT(0.72531*A(I)/TEFF(I)/EE(NC))
+            DOP(NC,I)=SQRT(0.72531*A(I)/eff_temp(I)/EE(NC))
     !
              CALL ENDEP(EE(NC),A(I),BE(I),PE(I),AP(I),UM(I),EDGG,EDD)
             
@@ -143,7 +143,7 @@ subroutine musc(AP,UM,A,AB,BE,PE,TEFF,NL,AA,RC,GG, &
                     IF(L1.LT.0)GO TO 93
                     JL=J-(J2N(L1,I)-JN2(I))/2
 !                      4.617E3=2.605E3*1.772454
-                    C0=4.617E3/EE(NC)*AA(I)*AB(I)*G(JL,L1,I)
+                    C0=4.617E3/EE(NC)*AA(I)*abundance(I)*G(JL,L1,I)
 !                           MP: COUNTER FOR RESONANCE PAIRS
                     MP=1
 !                       FIND CENTRAL LEVEL INTERVAL AND ENERGY IN IT
@@ -377,7 +377,7 @@ subroutine musc(AP,UM,A,AB,BE,PE,TEFF,NL,AA,RC,GG, &
     RETURN
 end subroutine musc
 !
-subroutine muss(AP,UM,A,AB,BE,PE,TEFF,NL,AA,RC,GG, &
+subroutine muss(AP,UM,A,abundance,BE,PE,eff_temp,NL,AA,RC,GG, &
                 R,EFF,J2X,J2N,E,SG,SP,G,GNR,GNRIN,DJL,SSCF,DSSCF,N,K, &
                 I,L,J,NI,LX,RN,RX,ZH,PO,PS,DPO,DPS,numResPairs,SGM,STM,DSGM,DSTM, &
                 TMC,DTMC,SNC,XNSS,ITYPE,IHIST,LJX,LJN,JN2,JMX)
@@ -386,7 +386,7 @@ subroutine muss(AP,UM,A,AB,BE,PE,TEFF,NL,AA,RC,GG, &
 !             MUSS YIELDS THE MULTIPLE SCATTERING CORRECTION FOR A
 !             SPHERICAL SHELL (MONTE CARLO)
 
-    real(8), allocatable, dimension(:) :: AP,UM,A,SS,STT,AB,BE,PE,TEFF, &
+    real(8), allocatable, dimension(:) :: AP,UM,A,SS,STT,abundance,BE,PE,eff_temp, &
                               AA,RC,E,SG,SP,RN,RX,ZH,ZST,ZSG,ZT,ZF0, &
                               GNL,EE,STMC,SGMC,TM,PSM,POM
     integer, allocatable, dimension(:) :: NL,JN2,JMX
@@ -437,7 +437,7 @@ subroutine muss(AP,UM,A,AB,BE,PE,TEFF,NL,AA,RC,GG, &
         IF(NC.EQ.1)EE(NC)=E(K)
         IF(NC.GT.1)EE(NC)=EE(NC-1)*FE
         do I=1,NI
-            DOP(NC,I)=SQRT(0.72531*A(I)/TEFF(I)/EE(NC))
+            DOP(NC,I)=SQRT(0.72531*A(I)/eff_temp(I)/EE(NC))
             LX=NL(I)
             do L=1,LX
         !
@@ -497,7 +497,7 @@ subroutine muss(AP,UM,A,AB,BE,PE,TEFF,NL,AA,RC,GG, &
                     IF(L1.LT.0)GO TO 93
 !                    4.617E3=2.605E3*1.772454
                     JL=J-(J2N(L1,I)-JN2(I))/2
-                    C0=4.617E3/EE(NC)*AA(I)*AB(I)*G(JL,L1,I)
+                    C0=4.617E3/EE(NC)*AA(I)*abundance(I)*G(JL,L1,I)
                     MP=1
 !                    FIND CENTRAL LEVEL INTERVAL AND ENERGY IN IT
 !
@@ -690,7 +690,7 @@ subroutine muss(AP,UM,A,AB,BE,PE,TEFF,NL,AA,RC,GG, &
     RETURN
 end subroutine muss
 !
-subroutine moct(AP,UM,A,AB,BE,PE,TEFF,NL,AA,RC,GG,R,EFF,J2X,J2N,XN,E,SG,SP,G,   &
+subroutine moct(AP,UM,A,abundance,BE,PE,eff_temp,NL,AA,RC,GG,R,EFF,J2X,J2N,XN,E,SG,SP,G,   &
                 GNR,GNRIN,DJL,N,K,I,L,J,NI,LX,ZH,numResPairs,SGM,STM,DSGM,DSTM, &
                 TMC,DTMC,TAU,DTAU,IHIST,LJX,LJN,JN2,JMX)
 
@@ -698,7 +698,7 @@ subroutine moct(AP,UM,A,AB,BE,PE,TEFF,NL,AA,RC,GG,R,EFF,J2X,J2N,XN,E,SG,SP,G,   
 !             MOCT  YIELDS THE SELF-SHIELDING CORRECTION FACTOR AND
 !             TRANSMISSION FOR A CYLINDRICAL SAMPLE
 
-    real(8), allocatable, dimension(:) :: AP,UM,A,STT,AB,BE,PE,TEFF,AA,RC,   &
+    real(8), allocatable, dimension(:) :: AP,UM,A,STT,abundance,BE,PE,eff_temp,AA,RC,   &
                                           XN,E,SG,SP,ZH,ZST,ZSG,ZT,GNL,TMCG,TN, &
                                           SGMC,STMC,DOP
     integer, allocatable, dimension(:) :: NL,JN2,JMX
@@ -737,7 +737,7 @@ subroutine moct(AP,UM,A,AB,BE,PE,TEFF,NL,AA,RC,GG,R,EFF,J2X,J2N,XN,E,SG,SP,G,   
         ZT(IT)=0.
     end do
     do I=1,NI
-        DOP(I)=SQRT(0.72531*A(I)/TEFF(I)/E(K))
+        DOP(I)=SQRT(0.72531*A(I)/eff_temp(I)/E(K))
 !
         CALL ENDEP(E(K),A(I),BE(I),PE(I),AP(I),UM(I),EDGG(I,K),EDD(I,K))
 !
@@ -790,7 +790,7 @@ subroutine moct(AP,UM,A,AB,BE,PE,TEFF,NL,AA,RC,GG,R,EFF,J2X,J2N,XN,E,SG,SP,G,   
                 IF(L1.LT.0)GO TO 93
             !           4.617E3=2.605E3*1.772454
                 JL=J-(J2N(L1,I)-JN2(I))/2
-                C0=4.617E3/E(K)*AA(I)*AB(I)*G(JL,L1,I)
+                C0=4.617E3/E(K)*AA(I)*abundance(I)*G(JL,L1,I)
                 MP=1
             !            FIND CENTRAL LEVEL INTERVAL AND ENERGY IN IT
             !
@@ -1396,15 +1396,21 @@ subroutine porter(GNAV,GN)
 !             PORTER YIELDS NEUTRON WIDTHS WITH THE PORTER-THOMAS
 !             DISTRIBUTION. GNAV IS THE AVERAGE WIDTH.
 !             V. NEUMANN SCHEME
+! ---------------------------------------------------------------------
+! ---- Sample a simpler function that envelopes the porter distribution.
+! ---- If the sample is within the Porter, keep. If not re-sample
+! ---------------------------------------------------------------------
     real(8), intent(in) :: GnAv
     real(8), intent(out) :: Gn
-    real(8) :: r,rr,x
+    real(8) :: r,rr,x,norm
+
+    norm = 0.560 ! normalize max PDF value to one
 
 1   R=random()*0.929
     RR=1./(1.-R)**2
     X=R**2*RR
     IF(X.GT.170.) GO TO 1
-    IF(random().GT.0.560*EXP(-X)*RR)GO TO 1
+    IF(random().GT.norm*EXP(-X)*RR)GO TO 1
     GN=2.*GNAV*X
     RETURN
 end subroutine porter
@@ -1418,10 +1424,6 @@ subroutine space(DAV,D)
 !             SPACE YIELDS LEVEL SPACINGS WITH A D-WEIGHTED WIGNER
 !             DISTRIBUTION. DAV IS THE AVERAGE OF THE WIGNER DISTRIBU-
 !             TION. V. NEUMANN SCHEME
-! ---------------------------------------------------------------------
-! ---- Sample a simpler function that envelopes the porter distribution.
-! ---- If the sample is within the Porter, keep. If not re-sample
-! ---------------------------------------------------------------------
 1   R=random()
     X=(R/(1.-R))**0.3333
     IF(X.GT.13.) GO TO 1

@@ -16,9 +16,9 @@ program sesh
 !     NUCLEUS, (2) ONLY THE S-WAVE LEVEL SPACING MUST BE GIVEN (SPACING
 !     INPUT FOR L>0 IS IGNORED). FURTHERMORE, CHANNEL RADIUS AND
 !     EFFECTIVE NUCLEAR RADIUS ARE DISTINCT FOR ALL PARTIAL WAVES:
-!     THE CHANNEL RADIUS IS TAKEN AS RC(I)=(1.23*A**(1/3)+0.80) FM,
+!     THE CHANNEL RADIUS IS TAKEN AS chan_rad(I)=(1.23*A**(1/3)+0.80) FM,
 !     THE EFFECTIVE NUCLEAR RADII R(L,I) ARE INPUT NUMBERS WITH THE
-!     DEFAULT VALUES R(L,I)=RC(I).
+!     DEFAULT VALUES R(L,I)=chan_rad(I).
 !
 !     INPUT LIMITATIONS:
 !             UP TO      10 ISOTOPES
@@ -30,10 +30,10 @@ program sesh
 
     implicit none
 !
-    real(8), allocatable, dimension(:) :: COMM,ZL,AP,UM,A,SC,ST,AB,BE,PE,TEFF, &
-                                          SPIN,AA,RC,XN,E,SG,SP,RN,RX,ZH,RB
+    real(8), allocatable, dimension(:) :: COMM,ZL,AP,UM,A,SC,ST,abundance,BE,PE,eff_temp, &
+                                          spin,AA,chan_rad,XN,E,SG,SP,R_in,R_outer,ZH,R_beam
     integer, allocatable, dimension(:) :: JX2,JN2,JMX,NL
-    real(8), allocatable, dimension(:,:) :: SGI,GG,D,S,SI,R,EFF,SUMGJ,STI,SPI
+    real(8), allocatable, dimension(:,:) :: SGI,GG,D,S,SI,R,det_effic,SUMGJ,STI,SPI
     integer, allocatable, dimension(:,:) :: J2X,J2N
     real(8), allocatable, dimension(:,:,:) :: SGL,G,GNR,GNRIN,DJL,STL,SPL
     integer, allocatable, dimension(:,:,:) :: LJX,LJN
@@ -45,7 +45,7 @@ program sesh
     integer :: I,I2,IHIST,ITYPE,ITYPO,IY,J,J2,J2MN,J2MX,JX,K,KQ,KZ,L,LL,LX,M, &
                M4,MJ,N,NE,NI,NN,NQ,numResPairs
 
-! ---- Jesse Mod --------------------------------------------------------------
+! ------------------------------------------------------------------------------
     CHARACTER (LEN=100) :: inp_file_name
     CHARACTER (LEN=100) :: out_file_name
     CHARACTER (LEN=100) :: results_file_name
@@ -53,11 +53,11 @@ program sesh
 
     ! --- dimension variables now -------
     allocate(COMM(18),ZL(4),SGI(10,100),SGL(10,100,4),AP(10),UM(10),A(11),      &
-             SC(100),ST(100),AB(11),BE(11),PE(11),TEFF(11),SPIN(11),NL(10),     &
-             AA(10),RC(10),GG(5,11),D(5,11),S(5,11),SI(5,11),R(5,11),EFF(5,11), &
+             SC(100),ST(100),abundance(11),BE(11),PE(11),eff_temp(11),spin(11),NL(10),     &
+             AA(10),chan_rad(10),GG(5,11),D(5,11),S(5,11),SI(5,11),R(5,11),det_effic(5,11), &
              J2X(4,10),J2N(4,10),SUMGJ(4,10),XN(6),E(100),SG(100),SP(100),      &
-             G(8,4,10),GNR(8,4,10),GNRIN(8,4,10),DJL(8,4,10),RN(6),RX(6),       &
-             ZH(100),LJX(2,8,10),LJN(2,8,10),JX2(10),JN2(10),JMX(10),RB(6),     &
+             G(8,4,10),GNR(8,4,10),GNRIN(8,4,10),DJL(8,4,10),R_in(6),R_outer(6),       &
+             ZH(100),LJX(2,8,10),LJN(2,8,10),JX2(10),JN2(10),JMX(10),R_beam(6),     &
              STI(10,100),SPI(10,100),STL(10,100,4),SPL(10,100,4))
 
     ! -----------------------------------
@@ -70,7 +70,7 @@ program sesh
     read(*,*) results_file_name
     print *, "Correction file name?"
     read(*,*) cor_file_name
-! -----------------------------------------------------------------------------
+! ------------------------------------------------------------------------------
     open (unit=5,  file=inp_file_name,    status='old')     ! -- Input file
     open (unit=8,  file=out_file_name,    status='unknown') ! -- Main output file
     open (unit=11, file=results_file_name,status='unknown') ! -- Formatted partial wave cross section output (analytical calc.))
@@ -90,10 +90,10 @@ program sesh
     I=0
     I=I+1
 !             I-TH ISOTOPE (MAXIMUM OF 10 ISOTOPES):
-!             NUCLEON NUMBER A(I), ABUNDANCE AB(I), BINDING ENERGY BE(I) [MeV], PAIRING
-!             ENERGY PE(I) [MeV], EFFECTIVE SAMPLE TEMPERATURE  TEFF(I) [DEG. K],
-!             TARGET SPIN QUANTUM NUMBER SPIN(I);
-    READ(5,101)A(I),AB(I),BE(I),PE(I),TEFF(I),SPIN(I)
+!             NUCLEON NUMBER A(I), ABUNDANCE abundance(I), BINDING ENERGY BE(I) [MeV], PAIRING
+!             ENERGY PE(I) [MeV], EFFECTIVE SAMPLE TEMPERATURE  eff_temp(I) [DEG. K],
+!             TARGET SPIN QUANTUM NUMBER spin(I);
+    READ(5,101)A(I),abundance(I),BE(I),PE(I),eff_temp(I),spin(I)
 101 FORMAT(6E10.5)
     L=0
 3   L=L+1
@@ -102,7 +102,7 @@ program sesh
 !             FUNCTION FOR ELASTIC SCATTERING S(L,I), STRENGTH FUNCTION FOR
 !             INELASTIC SCATTERING SI(L,I), NUCLEAR RADIUS R(L,I) [fm], DETECTION
 !             EFFICIENCY
-    READ(5,102)GG(L,I),D(L,I),S(L,I),SI (L,I),R(L,I),EFF(L,I)
+    READ(5,102)GG(L,I),D(L,I),S(L,I),SI (L,I),R(L,I),det_effic(L,I)
 102 FORMAT(6E10.5)
 !             CHECK FOR SAMPLE THICKNESS CARD  (FIRST WORD ZERO)
     IF(GG(L,I).EQ.0.0)GO TO 4
@@ -112,17 +112,17 @@ program sesh
     NL(I)=L-1
     I=I+1
     A(I)=GG(L,I-1)
-    AB(I)=D(L,I-1)
+    abundance(I)=D(L,I-1)
     BE(I)=S(L,I-1)
     PE(I)=SI(L,I-1)
-    TEFF(I)=R(L,I-1)
-    SPIN(I)=EFF(L,I-1)
+    eff_temp(I)=R(L,I-1)
+    spin(I)=det_effic(L,I-1)
     GG(L,I-1)=0.
     D(L,I-1) =0.
     S(L,I-1) =0.
     SI(L,I-1)=0.
     R(L,I-1) =0.
-    EFF(L,I-1)=0.
+    det_effic(L,I-1)=0.
     L=0
     GO TO 3
 !             LAST CARD WAS SAMPLE THICKNESS CARD (NUCLEI/B),
@@ -133,7 +133,7 @@ program sesh
     XN(2)=S(L,I)
     XN(3)=SI(L,I)
     XN(4)=R(L,I)
-    XN(5)=EFF(L,I)
+    XN(5)=det_effic(L,I)
     XN(6)=0.
 
 !             FIND NUMBER OF SAMPLE THICKNESSES
@@ -147,33 +147,33 @@ program sesh
 
 !             READ OUTER RADII (NUCLEI/BARN)
 
-6   READ(5,103)(RX(N),N=1,5)
-    RX(6)=0.
+6   READ(5,103)(R_outer(N),N=1,5)
+    R_outer(6)=0.
     IF(NN.GT.1)GO TO 8
 
 !             FIND NUMBER OF SHELL THICKNESSES FOR SHELL TRANSMISSION
 !             DATA
 
     DO 7 N=2,6
-    IF(RX(N).NE.0.)GO TO 7
+    IF(R_outer(N).NE.0.)GO TO 7
     NN=N-1
     GO TO 8
 7   CONTINUE
 
 
 !             READ INNER RADII (NUCLEI/BARN) FOR SHELL TRANSMISSION
-!             CALCULATIONS. RN(N)=0. MEANS CYLINDRICAL SAMPLE
+!             CALCULATIONS. R_in(N)=0. MEANS CYLINDRICAL SAMPLE
 
 
-8   READ(5,103)(RN(N),N=1,5)
+8   READ(5,103)(R_in(N),N=1,5)
 
 103 FORMAT(E20.5,4E10.5)
       
 !         BJM Modification 10/20/2015-- READ BEAM RADIUS (NUCLEI/BARN)
-!                         FOR CAPTURE SAMPLES RB(N)=0.0 MEANS 
+!                         FOR CAPTURE SAMPLES R_beam(N)=0.0 MEANS 
 !                         BEAM RADIUS >= SAMPLE RADIUS      
 !      
-88  READ(5,103)(RB(N),N=1,5)
+88  READ(5,103)(R_beam(N),N=1,5)
 
 !             READ NUMBER OF RESONANCE PAIRS
 
@@ -217,13 +217,15 @@ program sesh
     '.   (FM)              '/)
 
 
+! ------------- End of file reading --------------------------------------------
+
 !             PREPARE ENERGY-INDEPENDENT PARAMETERS AND PRINT INPUT
 
     DO 16 I=1,NI
 
 !             CHANNEL RADIUS
 
-        RC(I)=1.23*A(I)**(1./3.)+0.8
+        chan_rad(I)=1.23*A(I)**(1./3.)+0.8
 
 !             GILBERT-CAMERON MATCHING ENERGY
 
@@ -233,7 +235,7 @@ program sesh
 
 !             FIND FERMI GAS MODEL A-PARAMETER FROM S-WAVE SPACING
 
-        QI=SPIN(I)+.5
+        QI=spin(I)+.5
         U=BE(I)-PE(I)
         CC=LOG(0.2367E6*AI*U/(D(1,I)*QI))
         XO=CC
@@ -248,7 +250,7 @@ program sesh
 
 !             DETERMINE MINIMUM AND MAXIMUM COMPOUND SPIN POSSIBLE
 
-        X2I=2.*SPIN(I)
+        X2I=2.*spin(I)
         I2=int(X2I+.01)
         LX=NL(I)
         DO 15 L=1,LX
@@ -286,9 +288,10 @@ program sesh
 !       -- End BJM 
         ZL(L)=FLOAT(L-1)
 14      CONTINUE
-        IF(R(L,I).EQ.0.)R(L,I)=RC(I)
+        IF(R(L,I).EQ.0.)R(L,I)=chan_rad(I)
 15      CONTINUE
-        WRITE(8,108)A(I),AB(I),BE(I),PE(I),TEFF(I),SPIN(I),(ZL(L),GG(L,I),D(L,I),S(L,I),SI (L,I),R(L,I),EFF(L,I),L=1,LX)
+        WRITE(8,108)A(I),abundance(I),BE(I),PE(I),eff_temp(I),spin(I), &
+                    (ZL(L),GG(L,I),D(L,I),S(L,I),SI (L,I),R(L,I),det_effic(L,I),L=1,LX)
 108     FORMAT(F6.1,F11.4,F8.3,F9.3,2F8.1,F7.0,1PE16.4,1P,4E12.4,0PF9.4/(50X,0PF7.0,1PE16.4,1P,4E12.4,0PF9.4))
 16  CONTINUE
 
@@ -328,12 +331,12 @@ program sesh
             DO 19 L=1,LX
 
 !                 GET PENETRABILITIES, SHIFTS, HARD SPHERE PHASE SHIFTS
-                AK=RC(I)*SQRT(E(K)/AA(I))/143.92
+                AK=chan_rad(I)*SQRT(E(K)/AA(I))/143.92
 !               AK = radius*sqrt(Energy/A_mass)/H_bar
 !
                 CALL PEPS(AK,L,DUMMY,VL)
 !
-                RK=AK*R(L,I)/RC(I)
+                RK=AK*R(L,I)/chan_rad(I)
 !
                 CALL PEPS(RK,L,PL,DUMMY)
 !
@@ -370,19 +373,19 @@ program sesh
 18              CONTINUE
 
 !                 CONTRIBUTION TO EFFECTIVE CAPTURE CROSS SECTION
-                SGL(I,K,L)=4.09E3*AA(I)*AB(I)*GG(L,I)*EDGG*S3/E(K)/D(L,I)/EDD/SUMGJ(L,I)*EFF(L,I)
+                SGL(I,K,L)=4.09E3*AA(I)*abundance(I)*GG(L,I)*EDGG*S3/E(K)/D(L,I)/EDD/SUMGJ(L,I)*det_effic(L,I)
 
 !                 PURE CAPTURE CROSS SECTION
 
-                SC(K)=SC(K)+SGL(I,K,L)/EFF(L,I)
+                SC(K)=SC(K)+SGL(I,K,L)/det_effic(L,I)
 
 !                 CONTRIBUTION TO POTENTIAL SCATTERING CROSS SECTION
 
-                SPL(I,K,L)=2.605E3/E(K)*AA(I)*AB(I)*(2.*FLOAT(L)-1.)*SIN(PL)**2
+                SPL(I,K,L)=2.605E3/E(K)*AA(I)*abundance(I)*(2.*FLOAT(L)-1.)*SIN(PL)**2
 
 !                 CONTRIBUTION TO TOTAL CROSS SECTION
 
-                STL(I,K,L)=SPL(I,K,L)+4.09E6/SQRT(1000.*E(K))*AA(I)*AB(I)*S(L,I)*(2.*FLOAT(L)-1.)*VL*COS(2.*PL)
+                STL(I,K,L)=SPL(I,K,L)+4.09E6/SQRT(1000.*E(K))*AA(I)*abundance(I)*S(L,I)*(2.*FLOAT(L)-1.)*VL*COS(2.*PL)
 
 !                 FORM L-SUMS (PARTIAL WAVES)
 
@@ -456,10 +459,10 @@ program sesh
 !
     print *, "Beginning Monte Carlo simulations..."
 !
-    IF(XN(1).GT.0.0.AND.RX(1).GT.0.0.AND.RN(1).EQ.0.0)ITYPO=1 ! -- Circular capture sample geometry
-    IF(XN(1).EQ.0.0.AND.RX(1).GT.0.0.AND.RN(1).GT.0.0)ITYPO=2 ! -- Spherical shell geometry
-    IF(XN(1).GT.0.0.AND.RX(1).EQ.0.0.AND.RN(1).EQ.0.0)ITYPO=3 ! -- Transmission geometry
-    IF(XN(1).GT.0.0.AND.RX(1).GT.0.0.AND.RN(1).GT.0.0)ITYPO=4 ! -- Self-indication geometry
+    IF(XN(1).GT.0.0.AND.R_outer(1).GT.0.0.AND.R_in(1).EQ.0.0)ITYPO=1 ! -- Circular capture sample geometry
+    IF(XN(1).EQ.0.0.AND.R_outer(1).GT.0.0.AND.R_in(1).GT.0.0)ITYPO=2 ! -- Spherical shell geometry
+    IF(XN(1).GT.0.0.AND.R_outer(1).EQ.0.0.AND.R_in(1).EQ.0.0)ITYPO=3 ! -- Transmission geometry
+    IF(XN(1).GT.0.0.AND.R_outer(1).GT.0.0.AND.R_in(1).GT.0.0)ITYPO=4 ! -- Self-indication geometry
     IF(ITYPO.EQ.1)WRITE(8,113)
     IF(ITYPO.EQ.2)WRITE(8,114)
     IF(ITYPO.EQ.3)WRITE(8,115)
@@ -545,7 +548,7 @@ program sesh
     DO 36 I=1,NI
         LX=NL(I)
 !             TWICE EXTREME COMPOUND SPIN QUANTUM NUMBERS
-        I2=int(2.*SPIN(I) + 0.01)
+        I2=int(2.*spin(I) + 0.01)
         JX2(I)=I2+2*LX-1
         JN2(I)=I2-2*LX+1
         IF(I2.GT.6)GO TO 26
@@ -594,10 +597,10 @@ program sesh
             K=KQ
             IF(ZH(KQ).EQ.0.)GO TO 45
             IF(ZH(KQ).GT.0..AND.ZH(KQ).LT.100.)ZH(KQ)=100.
-            IF(XN(N).GT.0.0 .AND. RX(N).NE.0.0 .AND. RN(N).EQ.0.0)ITYPE=1
-            IF(XN(N).EQ.0.0 .AND. RX(N).NE.0.0 .AND. RN(N).NE.0.0)ITYPE=2
-            IF(XN(N).GT.0.0 .AND. RX(N).EQ.0.0 .AND. RN(N).EQ.0.0)ITYPE=3
-            IF(XN(N).GT.0.0 .AND. RX(N).NE.0.0 .AND. RN(N).NE.0.0)ITYPE=4
+            IF(XN(N).GT.0.0 .AND. R_outer(N).NE.0.0 .AND. R_in(N).EQ.0.0)ITYPE=1
+            IF(XN(N).EQ.0.0 .AND. R_outer(N).NE.0.0 .AND. R_in(N).NE.0.0)ITYPE=2
+            IF(XN(N).GT.0.0 .AND. R_outer(N).EQ.0.0 .AND. R_in(N).EQ.0.0)ITYPE=3
+            IF(XN(N).GT.0.0 .AND. R_outer(N).NE.0.0 .AND. R_in(N).NE.0.0)ITYPE=4
             IF(ITYPE.EQ.ITYPO)GO TO 38
             IF(ITYPE.EQ.1)WRITE(8,113)
             IF(ITYPE.EQ.2)WRITE(8,114)
@@ -608,32 +611,32 @@ program sesh
             GO TO (39,40,42,43),ITYPE
 !           39 xx and 43 off to shut off multiple scattering (39, 40, 42, 43)
 !           CYLINDRICAL SAMPLE CAPTURE
-39          CALL MUSC(AP,UM,A,AB,BE,PE,TEFF,NL,AA,RC,GG, &
-                R,EFF,J2X,J2N,XN,E,SG,SP,G,GNR,GNRIN,DJL,SSCF,DSSCF, &
-                N,K,I,L,J,NI,LX,RN,RX,ZH,PO,PS,DPO,DPS,numResPairs,SGM,STM,DSGM,DSTM, &
-                TMC,DTMC,SNC,ITYPE,IHIST,LJX,LJN,JN2,JMX, RB)
+39          CALL MUSC(AP,UM,A,abundance,BE,PE,eff_temp,NL,AA,chan_rad,GG, &
+                R,det_effic,J2X,J2N,XN,E,SG,SP,G,GNR,GNRIN,DJL,SSCF,DSSCF, &
+                N,K,I,L,J,NI,LX,R_in,R_outer,ZH,PO,PS,DPO,DPS,numResPairs,SGM,STM,DSGM,DSTM, &
+                TMC,DTMC,SNC,ITYPE,IHIST,LJX,LJN,JN2,JMX, R_beam)
 !
             GO TO 41
 !
 !           SPHERICAL SHELL CAPTURE
-40          CALL MUSS(AP,UM,A,AB,BE,PE,TEFF,NL,AA,RC,GG, &
-                R,EFF,J2X,J2N,E,SG,SP,G,GNR,GNRIN,DJL,SSCF,DSSCF, &
-                N,K,I,L,J,NI,LX,RN,RX,ZH,PO,PS,DPO,DPS,numResPairs,SGM,STM,DSGM,DSTM, &
+40          CALL MUSS(AP,UM,A,abundance,BE,PE,eff_temp,NL,AA,chan_rad,GG, &
+                R,det_effic,J2X,J2N,E,SG,SP,G,GNR,GNRIN,DJL,SSCF,DSSCF, &
+                N,K,I,L,J,NI,LX,R_in,R_outer,ZH,PO,PS,DPO,DPS,numResPairs,SGM,STM,DSGM,DSTM, &
                 TMC,DTMC,SNC,XNSS,ITYPE,IHIST,LJX,LJN,JN2,JMX)
 !
-            XN(N)=RX(N)-RN(N)
+            XN(N)=R_outer(N)-R_in(N)
 41          IF(K.EQ.1) &
-                WRITE(8,117)XN(N),E(K),SGM,STM,PO,PS,SSCF,SNC, ZH(K),float(numResPairs),RX(N), &
+                WRITE(8,117)XN(N),E(K),SGM,STM,PO,PS,SSCF,SNC, ZH(K),float(numResPairs),R_outer(N), &
                 TMC  ,DSGM,DSTM,DPO,DPS,DSSCF,DTMC
             IF(K.GT.1) &
-                WRITE(8,118)      E(K),SGM,STM,PO,PS,SSCF,SNC, ZH(K),float(numResPairs),RX(N), &
+                WRITE(8,118)      E(K),SGM,STM,PO,PS,SSCF,SNC, ZH(K),float(numResPairs),R_outer(N), &
                 TMC  ,DSGM,DSTM,DPO,DPS,DSSCF,DTMC
                 WRITE(12,312)E(K),STM,DSTM,SGM,DSGM,SSCF,DSSCF
             GO TO 44
 !
 !           TRANSMISSION
-42          CALL MOCT(AP,UM,A,AB,BE,PE,TEFF,NL,AA,RC,GG, &
-                R,EFF,J2X,J2N,XN,E,SG,SP,G,GNR,GNRIN,DJL, &
+42          CALL MOCT(AP,UM,A,abundance,BE,PE,eff_temp,NL,AA,chan_rad,GG, &
+                R,det_effic,J2X,J2N,XN,E,SG,SP,G,GNR,GNRIN,DJL, &
                 N,K,I,L,J,NI,LX,ZH,numResPairs,SGM,STM,DSGM,DSTM, &
                 TMC,DTMC,TAU,DTAU,IHIST,LJX,LJN,JN2,JMX)
 !
@@ -644,17 +647,17 @@ program sesh
             GO TO 44
 !
 !           SELF-INDICATION
-43          CALL MUSC(AP,UM,A,AB,BE,PE,TEFF,NL,AA,RC,GG, &
-                R,EFF,J2X,J2N,XN,E,SG,SP,G,GNR,GNRIN,DJL,SSCF,DSSCF, &
-                N,K,I,L,J,NI,LX,RN,RX,ZH,PO,PS,DPO,DPS,numResPairs,SGM,STM,DSGM,DSTM, &
-                TMC,DTMC,SNC,ITYPE,IHIST,LJX,LJN,JN2,JMX, RB)
+43          CALL MUSC(AP,UM,A,abundance,BE,PE,eff_temp,NL,AA,chan_rad,GG, &
+                R,det_effic,J2X,J2N,XN,E,SG,SP,G,GNR,GNRIN,DJL,SSCF,DSSCF, &
+                N,K,I,L,J,NI,LX,R_in,R_outer,ZH,PO,PS,DPO,DPS,numResPairs,SGM,STM,DSGM,DSTM, &
+                TMC,DTMC,SNC,ITYPE,IHIST,LJX,LJN,JN2,JMX, R_beam)
 !
             IF(K.EQ.1) &
-                WRITE(8,121)XN(N),E(K),SGM,STM,PO,PS,SSCF,SNC, ZH(K),numResPairs,RX(N), &
-                RN(N),DSGM,DSTM,DPO,DPS,DSSCF
+                WRITE(8,121)XN(N),E(K),SGM,STM,PO,PS,SSCF,SNC, ZH(K),numResPairs,R_outer(N), &
+                R_in(N),DSGM,DSTM,DPO,DPS,DSSCF
             IF(K.GT.1) &
-                WRITE(8,122)      E(K),SGM,STM,PO,PS,SSCF,SNC, ZH(K),numResPairs,RX(N), &
-                RN(N),DSGM,DSTM,DPO,DPS,DSSCF
+                WRITE(8,122)      E(K),SGM,STM,PO,PS,SSCF,SNC, ZH(K),numResPairs,R_outer(N), &
+                R_in(N),DSGM,DSTM,DPO,DPS,DSSCF
 117         FORMAT(/ &
             1PE10.3,0PF7.3,1PE11.3,2E10.3,3E13.3,0P,2F10.0,1X,1P,2E10.3/ &
                      17X,1PE11.3,2E10.3,2E13.3,44X        ,1P E10.3/)
