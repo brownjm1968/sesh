@@ -8,7 +8,7 @@ from the input of several nuclear data researchers and their contributions are a
 
 `sesh` solves the problem of resonance self-shielding, the experimental effect seen in time-of-flight
 experiments where the measured time/energy-averaged transmission data cannot be compared directly to 
-theoretical cross section due to the inequality: \<f(x)\> != f(\<x\>) for non-linear equations.
+theoretical cross section due to the inequality: <img src="https://render.githubusercontent.com/render/math?math=\langle f(x)\rangle != f(\langle x\rangle)"> for non-linear equations.
 
 ------------------------
 # Getting Started
