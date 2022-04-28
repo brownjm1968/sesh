@@ -10,7 +10,7 @@ from the input of several nuclear data researchers and their contributions are a
 experiments where the measured time/energy-averaged transmission data cannot be compared directly to 
 theoretical cross section due to the inequality:
 
-<img src="https://render.githubusercontent.com/render/math?math={\color{darkgray}\langle f(x)\rangle != f(\langle x\rangle)}"> 
+<img src="https://render.githubusercontent.com/render/math?math={\mathbf\color{darkgray}\langle f(x)\rangle != f(\langle x\rangle)}"> 
 
 for non-linear equations.
 
