@@ -22,5 +22,11 @@ set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} ${dialect}")
 #
 # Compile.
 #
-file(GLOB_RECURSE sources  src/*.f90 )
+file(GLOB_RECURSE sources  src/mc-routines.f90
+                           src/physics.f90
+                           src/sesh.f90 )
+file(GLOB_RECURSE testsrc  test/test-sesh.f90 )
 add_executable(sesh ${sources})
+add_executable(test-sesh ${testsrc} src/physics.f90 )
+
+# target_link_libraries(test-sesh sources)
