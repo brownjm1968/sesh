@@ -42,7 +42,7 @@ subroutine endep(E,A,B,P,AP,UM,EDGG,EDD)
 
     DIMENSION Y1(21),Y2(21)
 !    PRINT*, E, A, B, P, AP, UM, EDGG, EDD
-    E=0.001*E
+    E=0.001*E ! keV to MeV
     A1=A+1.
 !           LEVEL DENSITY FACTOR
     U =B+E-P
@@ -525,7 +525,7 @@ subroutine simp(Y,M,N,SUM)
     end do
     SUM=SUM/3.
     RETURN
-end subroutine
+end subroutine simp
 !
 function cbrt(MANT)
     implicit none

@@ -16,8 +16,33 @@ program test_sesh
 
 contains
 
+ function test_simp() result(pass)
+    use physics
+    implicit none
+    logical :: pass
+    real(8),dimension(21) :: function = 2.0d0
+    real(8) :: sum_gold,sum
+
+    function(1) = 3.0d0
+    function(21) = 3.0d0
+    ! simpsons rule but only summing heights, not area
+    sum_gold = 7.d0/3.d0 + 19*2.d0 + 7.d0/3.d0
+
+    call simp(function,1,21,sum)
+
+    if( abs(sum-sum_gold)<1e-30 ) then
+        pass = .true.
+    else
+        pass = .false.
+        print *, "Failed test_simp."
+        print *, "Gold, actual = ", sum_gold,sum
+    end if
+    
+end function test_simp
+
 function test_cbrt() result(pass)
     use physics
+    implicit none
     logical :: pass
     real(8) :: cbrt_gold,radius,exponent
     integer :: A
@@ -42,6 +67,7 @@ end function
 
 function test_peps() result(pass)
     use physics
+    implicit none
     logical :: pass,pl_good,vl_good
     integer :: L ! ang. momentum
     integer :: i
