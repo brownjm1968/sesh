@@ -530,7 +530,7 @@ end subroutine
 function cbrt(MANT)
     implicit none
 
-    integer(4), intent(in) :: mant
+    integer, intent(in) :: mant
     real(8) :: expo,cbrt
 
     EXPO=1./3.
