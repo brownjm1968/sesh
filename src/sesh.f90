@@ -592,6 +592,16 @@ program sesh
 !             BEGIN N-LOOP (SAMPLE THICKNESSES)
 37  DO 46 NQ=1,NN
         N=NQ
+        ! ---------------------------
+        ! Write header for correction file
+        ! ---------------------------
+        if( ITYPO.EQ.1 .OR. ITYPO.EQ.2 ) then
+            write(12,*) "energy eff-tot-xs err-tot eff-cap-xs err-cap corr err-corr"
+        end if
+        if( ITYPO.EQ.3 ) then
+            write(12,*) "energy eff-cap-xs err-cap eff-tot-xs err-tot trans err-trans corr err-corr"
+        end if
+        
 !             BEGIN K-LOOP (ENERGIES)
         DO 45 KQ=1,NE
             PRINT*, "Running energy bin ", KQ, " of ", NE
@@ -645,6 +655,7 @@ program sesh
                 WRITE(8,119)XN(N),E(K),SGM,STM,TMC,TAU,ZH(K),float(numResPairs),DSGM,DSTM,DTMC,DTAU
             IF(K.GT.1) &
                 WRITE(8,120)      E(K),SGM,STM,TMC,TAU,ZH(K),float(numResPairs),DSGM,DSTM,DTMC,DTAU
+                write(12,313)     E(K),SGM,DSGM,STM,DSTM,TMC,DTMC,TAU,DTAU
             GO TO 44
 !
 !           SELF-INDICATION
@@ -675,10 +686,11 @@ program sesh
 122         FORMAT(0PF17.3,1PE11.3,2E10.3,3E13.3,0P,2F10.0,1X,1P,2E10.3/ &
                      17X,1PE11.3,2E10.3,2E13.3/)
 312         FORMAT(0PF10.3,6E11.3)
+313         FORMAT(0PF10.3,8E11.3)
 44          CONTINUE
 45      CONTINUE
 46  CONTINUE
-!    GO TO 1     ! JMB: I don't know why this was here
+!    GO TO 1     ! JMB: This was used to chain input files
 print *, new_line('a')," sesh is done!",new_line('a')
 999 STOP  
 end program sesh

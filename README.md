@@ -57,3 +57,7 @@ sesh < ../auto-in
 An input file called `ta181.inp` is given as an example for SESH input. The SESH input is more
 fully defined in the report by F. Froehner described [here](https://www.osti.gov/biblio/4554018).
 
+Input file notes to augment Frohner's report:
+- After the energy groups and number of histories card you must include a line *with a space in it*
+- An update was made to include a description of beam radius on sample (at/b), this follows geometry card 3.3
+
